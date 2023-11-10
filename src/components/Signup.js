@@ -1,57 +1,54 @@
-import './styles/login.css'
-import illustrate from './assets/illustrate.png'
+import './styles/authen.css'
+import login from './assets/elogin.svg'
 
-import React, { useState, useEffect, useRef } from 'react'
+import { Link } from "react-router-dom"
+import React, { useEffect, useState, useContext } from "react";
 
 export default function Signup(){
-
     return(
-        <section className="background hero is-fullheight is-flex is-justify-content-center is-align-items-center">
+        <section className="hero is-fullheight is-flex is-justify-content-center is-align-items-center">
             <div className="columns is-flex is-justify-content-center is-align-items-center">
-                <div className="column is-6-desktop is-6-tablet is-10-mobile">
-                    <div className="card">
-                        <div className="card-content">
-                            <div className="content">
-                                <h1 className="has-text-centered custom-font mb-4">Signup</h1>
+                <div className="column is-8">
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="content">
+                                <h1 className="has-text-centered custom-font">Welcome to Ink</h1>
                                 <div className="columns">
-                                    {/* For image */}
-                                    <div className="column is-hidden-mobile">
-                                        <img src={illustrate}/>
+                                    <div className="column is-6-desktop is-hidden-mobile">
+                                        <img src={login} width="500px" />
                                     </div>
-                                    {/* For input boxes */}
-                                    <div className="column is-flex is-justify-content-center is-flex-direction-column">
-                                        <div class="field" id="ewrapper">
-                                            <p class="control has-icons-left has-icons-right">
-                                                <input class="input" type="text" placeholder="Username" required />
-                                                <span class="icon is-small is-left">
-                                                <i class="fas fa-envelope"></i>
+                                    {/* Email login */}
+                                    <div className="column is-justify-content-center is-flex is-align-items-center is-flex-direction-column is-6-desktop">
+                                        <div className="field">
+                                            <p className="control has-icons-left">
+                                                <input className="input" type="email" placeholder="Username" />
+                                                <span className="icon is-small is-left">
+                                                    <i className="fas fa-user"></i>
                                                 </span>
                                             </p>
                                         </div>
-                                        <div class="field" id="ewrapper">
-                                            <p class="control has-icons-left has-icons-right">
-                                                <input class="input" type="email" placeholder="Email" required />
-                                                <span class="icon is-small is-left">
-                                                <i class="fas fa-envelope"></i>
+                                        <div className="field">
+                                            <p className="control has-icons-left">
+                                                <input className="input" type="email" placeholder="Email" />
+                                                <span className="icon is-small is-left">
+                                                    <i className="fas fa-envelope"></i>
                                                 </span>
                                             </p>
                                         </div>
-                                        <div class="field">
-                                            <p class="control has-icons-left">
-                                                <input class="input" type="password" placeholder="Password" required id="password" />
-                                                <span class="icon is-small is-left">
-                                                <i class="fas fa-lock"></i>
+                                        <div className="field">
+                                            <p className="control has-icons-left">
+                                                <input className="input" type="password" placeholder="Password" />
+                                                <span className="icon is-small is-left">
+                                                <i className="fas fa-lock"></i>
                                                 </span>
                                             </p>
                                         </div>
-                                        <div class="has-text-centered my-2">
-                                            <button class="button background has-text-white">Create Account</button>
+                                        <div className="is-flex is-align-items-center is-justify-content-center">
+                                            <button class="button custom-font custom-color has-text-white mx-1">Signup</button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="has-text-centered">
-                                    <p class="custom-font is-size-7">Alread have an account? <a>Login</a></p>
-                                </div>
+                                <p className="has-text-centered custom-font is-size-7">Alread have an account? <Link to="/">Login</Link></p>
                             </div>
                         </div>
                     </div>
