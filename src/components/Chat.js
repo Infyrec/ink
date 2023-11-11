@@ -30,6 +30,7 @@ export default function Chat(){
         })
         .catch((err) => {
             console.log(err);
+            navigate('/')
         })
     }, [])
 
@@ -215,10 +216,10 @@ export default function Chat(){
                                 <i className="fa-solid fa-phone"></i>
                             </span>
                         </button>
-                        <button className="button mx-1 has-background-warning" onClick={logoutUser}>
+                        <button className="button mx-1 has-background-danger" onClick={logoutUser}>
                             <span className="icon">
                                 {/* <i className="fa-solid fa-bars"></i> */}
-                                <i class="fa-solid fa-right-from-bracket"></i>
+                                <i class="fa-solid fa-right-from-bracket has-text-white"></i>
                             </span>
                         </button>
                     </div>

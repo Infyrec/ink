@@ -43,7 +43,17 @@ export default function Login(){
                 }                
               })
               .catch((err) => {
-                console.log(err);
+                setError({
+                    status: true,
+                    message: 'Invalid Username or Password'
+                })
+
+                setTimeout(() => {
+                    setError({
+                        status: false,
+                        message: 'Email or Password Incorrect !'
+                    })
+                }, 2000)
               });
         }
         catch(e){
