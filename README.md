@@ -1,6 +1,9 @@
-In the project directory, you can run:
+Project & Branch Details
 
-### `npm start`
+### `main branch`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Main branch contains frontend code built using react
+
+### `auth branch`
+
+Auth branch contains authentication server code
