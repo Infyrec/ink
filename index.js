@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const { sign, verify } = require('jsonwebtoken')
 const cookieParse = require('cookie-parser')
 const mongoose = require('mongoose');
-const Model = require('./schema/signupModel')
+const SignupModel = require('./schema/signupModel')
 require('dotenv').config()
 
 const dbConnect = process.env.DATABASE_URL
@@ -31,15 +31,32 @@ app.get('/', (req, res) => {
     res.send('Auth server working fine !')
 })
 
+app.post('/uname', async(req, res) => {
+    let { name } = req.body
+    try{
+        let result = await SignupModel.findOne({ username: name }).exec();
+        if(result == null){
+            res.status(200).send({status: 'available'})
+        }
+        else{
+            res.status(200).send({status: 'unavailable'})
+        }
+    }
+    catch(e){
+        res.status(406).send({status: 'unavailable'})
+    }
+})
+
 app.post('/signup', (req, res) => {
     let { username, email, password } = req.body
 
     bcrypt.hash(password, 10, async(err, hash) => {
         try{
-            let data = new Model({
+            let data = new SignupModel({
                 username: username,
                 email: email,
-                password: hash
+                password: hash,
+                verified: false
             })
     
             const dataToSave = await data.save();
@@ -55,21 +72,31 @@ app.post('/login', async(req, res) => {
     let { email, password } = req.body
 
     try{
-        let data = new Model({
-            email: email,
-            password: password
-        })
+        let result = await SignupModel.findOne({ email: email }).exec();
+
+        if(result){
+            bcrypt.compare(password, result.password, function(err, response) {
+                if(response){
+                    let accessToken = sign({email: email}, process.env.SECRET_KEY)
         
-        let accessToken = sign({email: email}, process.env.SECRET_KEY)
+                    res.cookie('access-token', accessToken, {
+                        maxAge: 3600000
+                    })
+                
+                    res.status(200).send({verified: true, status: 'success', message: 'Cookie Generated.'})
+                }
     
-        res.cookie('access-token', accessToken, {
-            maxAge: 3600000
-        })
-    
-        res.send({verified: true, status: 'success', message: 'Cookie Generated.'})
+                if(!response){
+                    res.status(403).send({verified: false, status: 'invalid', message: 'Invalid email or password.'})
+                }
+            });
+        }
+        else{
+            res.status(404).send({verified: false, status: 'failed', message: 'User not found.'})
+        }
     }
     catch(e){
-        res.send({verified: 'unknown', status: 'failed', message: 'Login failed.'})
+        res.status(500).send({verified: 'unknown', status: 'failed', message: 'Login failed.'})
     }
 })
 
@@ -80,14 +107,14 @@ app.get('/chat', (req, res) => {
     if(token){
         try{
             let result = verify(token, process.env.SECRET_KEY)
-            res.send({verified: true, status: 'success', message: 'Cookie Validated.'})
+            res.status(200).send({verified: true, status: 'success', message: 'Cookie Validated.'})
         }
         catch(e){
-            res.send('Cookie is not valid.')
+            res.status(400).send('Cookie is not valid.')
         }
     }
     else{
-        res.send('Cookie not found. Please login again !')
+        res.status(401).send('Cookie not found. Please login again !')
     }
 })
 

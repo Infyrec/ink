@@ -14,6 +14,9 @@ const credSchema = new mongoose.Schema({
     password: {
         required: true,
         type: String
+    },
+    verified: {
+        type: Boolean
     }
 })
 
