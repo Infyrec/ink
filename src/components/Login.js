@@ -1,8 +1,11 @@
 import './styles/authen.css'
+import 'aos/dist/aos.css';
 import login from './assets/elogin.svg'
 
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { z } from "zod";
+import AOS from 'aos';
+import axios from 'axios';
 import React, { useEffect, useState, useContext } from "react";
 
 const credSchema = z.object({
@@ -10,21 +13,52 @@ const credSchema = z.object({
     password: z.string().min(8)
 })
 
+let endpoint = 'http://192.168.0.213:3001'
+
 export default function Login(){
 
+    let navigate = useNavigate()
     let [cred, setCred] = useState({
         email: null,
         password: null
     })
+    let [error, setError] = useState({
+        status: false,
+        message: 'Email or Password Incorrect !'
+    })
+
+    useEffect(() => {
+        AOS.init();
+    }, [])
 
     let processLogin = () => {
         try{
             let result = credSchema.parse(cred)
-
-            console.log('Creds ok');
+            
+            axios.post(`${endpoint}/login`, cred, {withCredentials: true})
+              .then((res) => {
+                let status = res.data.verified
+                if(status){
+                    navigate('/chat')
+                }                
+              })
+              .catch((err) => {
+                console.log(err);
+              });
         }
         catch(e){
             console.log('Error: ' + e);
+            setError({
+                status: true,
+                message: 'Email or Password Incorrect !'
+            })
+
+            setTimeout(() => {
+                setError({
+                    status: false,
+                    message: 'Email or Password Incorrect !'
+                })
+            }, 2000)
         }
     }
 
@@ -69,6 +103,13 @@ export default function Login(){
                     </div>
                 </div>
             </div>
+            {
+                error.status ?
+                <div className="error-box is-flex is-align-items-center p-4" data-aos="fade-left">
+                    <p className="has-text-danger custom-font is-size-7">{error.message}</p>
+                </div>:
+                null
+            }
         </section>
     )
 }
