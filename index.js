@@ -1,8 +1,24 @@
 const express = require('express')
 const cors = require('cors')
 const app = express()
+const bcrypt = require('bcrypt');
 const { sign, verify } = require('jsonwebtoken')
 const cookieParse = require('cookie-parser')
+const mongoose = require('mongoose');
+const Model = require('./schema/signupModel')
+require('dotenv').config()
+
+const dbConnect = process.env.DATABASE_URL
+mongoose.connect(dbConnect);
+const database = mongoose.connection
+
+database.on('connected', () => {
+    console.log('Database Connected.');
+})
+
+database.on('error', (e) => {
+    console.log('Database Error: ' + e);
+})
 
 app.use(cors({
     origin: "http://192.168.0.213:3000",    
@@ -17,20 +33,44 @@ app.get('/', (req, res) => {
 
 app.post('/signup', (req, res) => {
     let { username, email, password } = req.body
-    console.log(req.body);
-    res.send('Credentials received successfully !')
+
+    bcrypt.hash(password, 10, async(err, hash) => {
+        try{
+            let data = new Model({
+                username: username,
+                email: email,
+                password: hash
+            })
+    
+            const dataToSave = await data.save();
+            res.status(200).send({verified: false, status: 'success', message: 'Account created.'})
+        }
+        catch(e){
+            res.status(400).send({verified: 'unknown', status: 'failed', message: 'Account creation failed.'})
+        }
+    });
 })
 
-app.post('/login', (req, res) => {
+app.post('/login', async(req, res) => {
     let { email, password } = req.body
+
+    try{
+        let data = new Model({
+            email: email,
+            password: password
+        })
+        
+        let accessToken = sign({email: email}, process.env.SECRET_KEY)
     
-    let accessToken = sign({email: email}, 'SECERTKEY')
-
-    res.cookie('access-token', accessToken, {
-        maxAge: 3600000
-    })
-
-    res.send({verified: true, status: 'success', message: 'Cookie Generated.', token: accessToken})
+        res.cookie('access-token', accessToken, {
+            maxAge: 3600000
+        })
+    
+        res.send({verified: true, status: 'success', message: 'Cookie Generated.'})
+    }
+    catch(e){
+        res.send({verified: 'unknown', status: 'failed', message: 'Login failed.'})
+    }
 })
 
 app.get('/chat', (req, res) => {
@@ -39,7 +79,7 @@ app.get('/chat', (req, res) => {
 
     if(token){
         try{
-            let result = verify(token, 'SECERTKEY')
+            let result = verify(token, process.env.SECRET_KEY)
             res.send({verified: true, status: 'success', message: 'Cookie Validated.'})
         }
         catch(e){
