@@ -4,7 +4,10 @@ const app = express()
 const { sign, verify } = require('jsonwebtoken')
 const cookieParse = require('cookie-parser')
 
-app.use(cors())
+app.use(cors({
+    origin: "http://192.168.0.213:3000",    
+    credentials: true
+}))
 app.use(express.json())
 app.use(cookieParse())
 
@@ -24,23 +27,23 @@ app.post('/login', (req, res) => {
     let accessToken = sign({email: email}, 'SECERTKEY')
 
     res.cookie('access-token', accessToken, {
-        maxAge: 30000
+        maxAge: 3600000
     })
 
-    res.send('Logged In Successfully !')
+    res.send({verified: true, status: 'success', message: 'Cookie Generated.', token: accessToken})
 })
 
-app.get('/profile', (req, res) => {
+app.get('/chat', (req, res) => {
 
     let token = req.cookies['access-token']
 
     if(token){
         try{
             let result = verify(token, 'SECERTKEY')
-            res.send('Cookie validated & logged in !')
+            res.send({verified: true, status: 'success', message: 'Cookie Validated.'})
         }
         catch(e){
-            res.send('Cookie is not valid...!')
+            res.send('Cookie is not valid.')
         }
     }
     else{
@@ -48,4 +51,4 @@ app.get('/profile', (req, res) => {
     }
 })
 
-app.listen(5000, () => console.log('Server running at port 5000 !'))
+app.listen(3001, () => console.log('Server running at port 3001 !'))
