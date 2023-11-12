@@ -2,30 +2,44 @@ import './styles/chat.css';
 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'
+import { io } from "socket.io-client";
 import React, { useState, useEffect, useRef, useContext } from "react";
+import { useGlobalVariable } from './GlobalVariable';
 
 let endpoint = 'http://192.168.0.213:3001'
+let connection = 'http://192.168.0.213:3002'
 
 export default function Chat(){
 
+    let socket = useRef()
     let navigate = useNavigate()
+    let { email, updateEmail } = useGlobalVariable()
 
     let [error, setError] = useState({
         status: false,
         message: 'This feature not enabled !'
     })
-
     let [message, setMessage] = useState([
         {type: 'post', time: null, name: 'Ragul', message: 'Hello'},
         {type: 'get', time: null, name: 'Suriya', message: 'Hi'}
     ])
 
+    // To check the authorization & initialization
     useEffect(() => {
         axios.get(`${endpoint}/chat`, {withCredentials: true})
         .then((res) => {
             let status = res.data.verified
             if(!status){
                 navigate('/')
+            }
+
+            if(!socket.current){
+                socket.current = io(connection)
+
+                socket.current.on('client-id', (id) => {
+                    console.log('Updating online');
+                    socket.current.emit('update-online', {email: email, sockid: id})
+                })
             }
         })
         .catch((err) => {
@@ -34,6 +48,7 @@ export default function Chat(){
         })
     }, [])
 
+    // To get the current time in 12hrs format
     function currentTime(){
         const d = new Date()
         const time = d.getHours()
@@ -81,6 +96,7 @@ export default function Chat(){
         }
     }    
 
+    // Sender's UI component
     function SentMessage(props){
         let { name, time, message } = props
         return(
@@ -99,6 +115,7 @@ export default function Chat(){
         )
     }
 
+    // Receiver's UI component
     function ReceivedMessage(props){
         let { name, time, message } = props
         return(
@@ -117,10 +134,12 @@ export default function Chat(){
         )
     }
 
+    // To logout user
     function logoutUser(){
 
     }
 
+    // To show features not enabled
     function notEnabled(){
         setError({
             status: true,

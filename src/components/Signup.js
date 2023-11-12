@@ -20,9 +20,9 @@ export default function Signup(){
 
     let navigate = useNavigate()
     let [cred, setCred] = useState({
-        username: null,
-        email: null,
-        password: null
+        username: '',
+        email: '',
+        password: ''
     })
     let [error, setError] = useState({
         status: false,

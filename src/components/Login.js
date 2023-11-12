@@ -7,6 +7,7 @@ import { z } from "zod";
 import AOS from 'aos';
 import axios from 'axios';
 import React, { useEffect, useState, useContext } from "react";
+import { useGlobalVariable } from './GlobalVariable';
 
 const credSchema = z.object({
     email: z.string().email(),
@@ -18,6 +19,7 @@ let endpoint = 'http://192.168.0.213:3001'
 export default function Login(){
 
     let navigate = useNavigate()
+    let { email, updateEmail } = useGlobalVariable()
     let [cred, setCred] = useState({
         email: null,
         password: null
@@ -39,6 +41,7 @@ export default function Login(){
               .then((res) => {
                 let status = res.data.verified
                 if(status){
+                    updateEmail(cred.email)
                     navigate('/chat')
                 }                
               })
