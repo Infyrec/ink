@@ -6,7 +6,10 @@ const credSchema = new mongoose.Schema({
     },
     email: {
         type: String
-    }
+    },
+    sockid: {
+        type: String
+    },
 })
 
 module.exports = mongoose.model('Online', credSchema)
