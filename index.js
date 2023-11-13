@@ -38,6 +38,19 @@ io.on("connection", (socket) => {
   socket.on('update-online', (data) => {
     updateAsOnline(data)
   })
+
+  socket.on('send-msg', async(data) => {
+    try{
+        let result = await DataModel.findOne({ email: data.sendTo }).exec();
+        
+        if(result){
+            io.to(result.sockid).emit('received-msg', data)
+        }
+    }
+    catch(e){
+        console.log(e);
+    }
+  })
 });
 
 // To fetch the active users list
