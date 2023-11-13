@@ -21,7 +21,7 @@ database.on('error', (e) => {
 })
 
 app.use(cors({
-    origin: "http://192.168.0.213:3000",    
+    origin: process.env.REQUEST_ORIGIN,    
     credentials: true
 }))
 app.use(express.json())
