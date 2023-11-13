@@ -7,7 +7,7 @@ export function useGlobalVariable(){
 }
 
 export function GlobalVariable({ children }){
-    let [email, updateEmail] = useState('Golobal Variable')
+    let [email, updateEmail] = useState(null)
 
     return(
         <GlobalStore.Provider value={{ email, updateEmail }}>

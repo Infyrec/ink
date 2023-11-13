@@ -39,11 +39,9 @@ export default function Login(){
             
             axios.post(`${endpoint}/login`, cred, {withCredentials: true})
               .then((res) => {
-                let status = res.data.verified
-                if(status){
-                    updateEmail(cred.email)
-                    navigate('/chat')
-                }                
+                    let { username, email } = res.data.userdata
+                    localStorage.setItem('ink-user', JSON.stringify({username, email}))
+                    navigate('/chat')             
               })
               .catch((err) => {
                 setError({
