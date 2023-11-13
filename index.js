@@ -60,10 +60,10 @@ app.post('/signup', (req, res) => {
             })
     
             const dataToSave = await data.save();
-            res.status(200).send({verified: false, status: 'success', message: 'Account created.'})
+            res.status(200).send({verified: false, status: 'success'})
         }
         catch(e){
-            res.status(400).send({verified: 'unknown', status: 'failed', message: 'Account creation failed.'})
+            res.status(400).send({verified: 'unknown', status: 'failed'})
         }
     });
 })
@@ -77,27 +77,36 @@ app.post('/login', async(req, res) => {
         if(result){
             bcrypt.compare(password, result.password, function(err, response) {
                 if(response){
+                    let data = {
+                        username: result.username,
+                        email: result.email
+                    }
                     let accessToken = sign({email: email}, process.env.SECRET_KEY)
         
                     res.cookie('access-token', accessToken, {
                         maxAge: 3600000
                     })
                 
-                    res.status(200).send({verified: true, status: 'success', message: 'Cookie Generated.'})
+                    res.status(200).send({verified: data.verified, status: 'success', userdata: data})
                 }
     
                 if(!response){
-                    res.status(403).send({verified: false, status: 'invalid', message: 'Invalid email or password.'})
+                    res.status(403).send({verified: false, status: 'invalid'})
                 }
             });
         }
         else{
-            res.status(404).send({verified: false, status: 'failed', message: 'User not found.'})
+            res.status(404).send({verified: false, status: 'failed'})
         }
     }
     catch(e){
-        res.status(500).send({verified: 'unknown', status: 'failed', message: 'Login failed.'})
+        res.status(500).send({verified: 'unknown', status: 'failed'})
     }
+})
+
+app.get('/logout', (req, res) => {
+    res.clearCookie('access-token')
+    res.status(200).send({verified: true, status: 'success'})
 })
 
 app.get('/chat', (req, res) => {
@@ -107,7 +116,7 @@ app.get('/chat', (req, res) => {
     if(token){
         try{
             let result = verify(token, process.env.SECRET_KEY)
-            res.status(200).send({verified: true, status: 'success', message: 'Cookie Validated.'})
+            res.status(200).send({verified: true, status: 'success'})
         }
         catch(e){
             res.status(400).send('Cookie is not valid.')
@@ -118,4 +127,4 @@ app.get('/chat', (req, res) => {
     }
 })
 
-app.listen(3001, () => console.log('Server running at port 3001 !'))
+app.listen(3001, () => console.log('Authentication server running at port 3001 !'))
