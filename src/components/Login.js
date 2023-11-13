@@ -14,7 +14,7 @@ const credSchema = z.object({
     password: z.string().min(8)
 })
 
-let endpoint = 'http://192.168.0.213:3001'
+let endpoint = 'http://192.168.0.131:3001'
 
 export default function Login(){
 

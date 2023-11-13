@@ -6,12 +6,13 @@ import { io } from "socket.io-client";
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { useGlobalVariable } from './GlobalVariable';
 
-let endpoint = 'http://192.168.0.213:3001' // Authentication server
-let connection = 'http://192.168.0.213:3002' // Socket server
+let endpoint = 'http://192.168.0.131:3001' // Authentication server
+let connection = 'http://192.168.0.131:3002' // Socket server
 
 export default function Chat(){
 
     let socket = useRef()
+    let scrollRef = useRef()
     let navigate = useNavigate()
     let { email, updateEmail } = useGlobalVariable()
 
@@ -22,6 +23,7 @@ export default function Chat(){
     })
     let [activeUsers, setActiveUsers] = useState([])
     let [focused, setFocused] = useState(null)
+    let [written, setWritten] = useState(null)
     let [message, setMessage] = useState([]) //{type: 'post', time: null, name: 'Ragul', message: 'Hello'}
 
     // To check the authorization & initialization
@@ -36,9 +38,21 @@ export default function Chat(){
             socket.current = io(connection)
 
             socket.current.on('client-id', (id) => {
+                console.log('Socket ID: ' + id);
                 let { username, email } = JSON.parse(localStorage.getItem('ink-user'))
                 console.log(username, email);
                 socket.current.emit('update-online', {email: email, sockid: id})
+            })
+
+            // Receive message from peer
+            socket.current.on('received-msg', (payload) => {
+                setMessage(prev => [...prev, {
+                    ...prev,
+                    type: 'get', 
+                    time: currentTime(), 
+                    name: payload.username, 
+                    message: payload.message
+                }])
             })
         })
         .catch((err) => {
@@ -174,6 +188,28 @@ export default function Chat(){
         }, 2000)
     }
 
+    // To send message
+    function sendMessage(){
+        if(written != null && written.length > 0){
+            let { username, email } = JSON.parse(localStorage.getItem('ink-user'))
+            let payload = {
+                message: written,
+                sendTo: focused.email,
+                username: username
+            }
+
+            setMessage(prev => [...prev, {
+                ...prev,
+                type: 'post', 
+                time: currentTime(), 
+                name: username, 
+                message: written
+            }])
+
+            socket.current.emit('send-msg', payload)
+        }
+    }
+
     return(
     <section className="hero is-fullheight">
         <div className="columns m-0">
@@ -275,13 +311,13 @@ export default function Chat(){
                         </div>
                     </div>
                     {/* Chat message area */}
-                    <div className="is-flex-grow-1 chat-area my-3">
+                    <div className="is-flex-grow-1 chat-area my-3" ref={scrollRef}>
                         {
                             message.map((data) => (
                                 data.type == 'post'?
-                                <SentMessage name={data.name} time={currentTime()} message={data.message}/>:
+                                <SentMessage name={data.name} time={data.time} message={data.message}/>:
                                 data.type == 'get'?
-                                <ReceivedMessage name={data.name} time={currentTime()} message={data.message}/>:
+                                <ReceivedMessage name={data.name} time={data.time} message={data.message}/>:
                                 null
                             ))
                         }
@@ -290,7 +326,7 @@ export default function Chat(){
                     <div className="is-flex is-flex-direction-row">
                         <div className="field mx-1" style={{width: "100%"}}>
                             <p className="control">
-                                <input className="input" type="text" placeholder="Type a message..." />
+                                <input className="input" type="text" placeholder="Type a message..." onChange={(e) => setWritten(e.target.value)}/>
                             </p>
                         </div>
                         <div className="button mx-1">
@@ -304,7 +340,7 @@ export default function Chat(){
                                 <i className="fa-solid fa-microphone"></i>
                             </span>
                         </div>
-                        <button className="button" style={{ backgroundColor: " #296eff" }}>
+                        <button className="button" style={{ backgroundColor: " #296eff" }} onClick={sendMessage}>
                             <span className="icon is-small">
                                 <i className="fa-regular fa-paper-plane has-text-white"></i>
                             </span>

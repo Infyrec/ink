@@ -8,7 +8,7 @@ import AOS from 'aos';
 import axios from 'axios';
 import React, { useEffect, useState, useContext } from "react";
 
-let endpoint = 'http://192.168.0.213:3001'
+let endpoint = 'http://192.168.0.131:3001'
 
 const credSchema = z.object({
     username: z.string().min(3),
