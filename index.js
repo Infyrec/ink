@@ -32,13 +32,23 @@ database.on('error', (error) => {
 io.on("connection", (socket) => {
   console.log('User Connected: ' + socket.id);
 
+  // To send socket id to the respective user
   io.to(socket.id).emit('client-id', socket.id);
 
-  //To update user online
+  // To notify new user joined
+  io.emit('user-base', 'user joined/exited.')
+
+  // To update user online
   socket.on('update-online', (data) => {
     updateAsOnline(data)
   })
 
+  // To update user offline
+  socket.on('update-offline', (data) => {
+    updateAsOffline(data)
+  })
+
+  // To exchange message between peers
   socket.on('send-msg', async(data) => {
     try{
         let result = await DataModel.findOne({ email: data.sendTo }).exec();
@@ -68,6 +78,7 @@ app.get('/activeusers', async(req, res) => {
 
 httpServer.listen(3002, () => console.log('Socket server started at 3002'));
 
+
 // To update online status on the database.
 async function updateAsOnline(data){
     let { email, sockid } = data
@@ -91,5 +102,18 @@ async function updateAsOnline(data){
         catch(e){
             console.log(e);
         }
+    }
+}
+
+
+// To update offline status on the database.
+async function updateAsOffline(data){
+    let { email, sockid } = data
+    try{
+        let result = await DataModel.findOneAndDelete({ email: email })
+        io.emit('user-base', 'user joined/exited.')
+    }
+    catch(e){
+        console.log(e);
     }
 }
