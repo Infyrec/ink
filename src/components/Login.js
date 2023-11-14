@@ -2,6 +2,7 @@ import './styles/authen.css'
 import 'aos/dist/aos.css';
 import login from './assets/elogin.svg'
 
+import { serve } from '../endpoint';
 import { Link, useNavigate } from "react-router-dom"
 import { z } from "zod";
 import AOS from 'aos';
@@ -14,7 +15,7 @@ const credSchema = z.object({
     password: z.string().min(8)
 })
 
-let endpoint = 'http://192.168.0.131:3001'
+let endpoint = serve.authentication
 
 export default function Login(){
 

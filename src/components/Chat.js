@@ -1,13 +1,14 @@
 import './styles/chat.css';
 
 import axios from 'axios';
+import { serve } from '../endpoint';
 import { useNavigate } from 'react-router-dom'
 import { io } from "socket.io-client";
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { useGlobalVariable } from './GlobalVariable';
 
-let endpoint = 'http://192.168.0.131:3001' // Authentication server
-let connection = 'http://192.168.0.131:3002' // Socket server
+let endpoint = serve.authentication // Authentication server
+let connection = serve.communication // Socket server
 
 export default function Chat(){
 
@@ -29,37 +30,64 @@ export default function Chat(){
     // To check the authorization & initialization
     useEffect(() => {
         // To verify login and update as online
+        loginAndUpdates()
+
+        // To fetch the active users list
+        onlineActiveUsers()
+    }, [])
+
+    // To auto scroll
+    useEffect(() => {
+        if(message.length > 0){
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+    }, [message])
+
+
+    // To update as online ----->
+    function loginAndUpdates(){
         axios.get(`${endpoint}/chat`, {withCredentials: true})
         .then((res) => {
             let status = res.data.verified
             if(!status){
                 navigate('/')
             }
-            socket.current = io(connection)
 
-            socket.current.on('client-id', (id) => {
-                console.log('Socket ID: ' + id);
-                let { username, email } = JSON.parse(localStorage.getItem('ink-user'))
-                console.log(username, email);
-                socket.current.emit('update-online', {email: email, sockid: id})
-            })
+            if(!socket.current){
+                socket.current = io(connection)
 
-            // Receive message from peer
-            socket.current.on('received-msg', (payload) => {
-                setMessage(prev => [...prev, {
-                    ...prev,
-                    type: 'get', 
-                    time: currentTime(), 
-                    name: payload.username, 
-                    message: payload.message
-                }])
-            })
+                // To update as online
+                socket.current.on('client-id', (id) => {
+                    console.log('Socket ID: ' + id);
+                    let { username, email } = JSON.parse(localStorage.getItem('ink-user'))
+                    console.log(username, email);
+                    socket.current.emit('update-online', {email: email, sockid: id})
+                })
+    
+                // Receive message from peer
+                socket.current.on('received-msg', (payload) => {
+                    setMessage(prev => [...prev, {
+                        ...prev,
+                        type: 'get', 
+                        time: currentTime(), 
+                        name: payload.username, 
+                        message: payload.message
+                    }])
+                })
+
+                // Triggers when new user join
+                socket.current.on('user-base', (payload) => {
+                    onlineActiveUsers()
+                })
+            }
         })
         .catch((err) => {
             navigate('/')
         })
+    }
 
-        // To fetch the active users list
+    // To get active users
+    function onlineActiveUsers(){
         axios.get(`${connection}/activeusers`)
         .then((res) => {
             let { username, email } = JSON.parse(localStorage.getItem('ink-user'))
@@ -74,7 +102,7 @@ export default function Chat(){
         .catch((err) => {
             console.log(err);
         })
-    }, [])
+    }
 
     // To get the current time in 12hrs format
     function currentTime(){
@@ -166,6 +194,9 @@ export default function Chat(){
     function logoutUser(){
         axios.get(`${endpoint}/logout`, {withCredentials: true})
         .then((res) => {
+            let { username, email } = JSON.parse(localStorage.getItem('ink-user'))
+            socket.current.emit('update-offline', {email: email})
+            socket.current = null
             navigate('/')              
         })
         .catch((err) => {
@@ -207,6 +238,7 @@ export default function Chat(){
             }])
 
             socket.current.emit('send-msg', payload)
+            setWritten('')
         }
     }
 
@@ -326,7 +358,7 @@ export default function Chat(){
                     <div className="is-flex is-flex-direction-row">
                         <div className="field mx-1" style={{width: "100%"}}>
                             <p className="control">
-                                <input className="input" type="text" placeholder="Type a message..." onChange={(e) => setWritten(e.target.value)}/>
+                                <input className="input" type="text" placeholder="Type a message..." value={written} onChange={(e) => setWritten(e.target.value)}/>
                             </p>
                         </div>
                         <div className="button mx-1">
@@ -348,7 +380,27 @@ export default function Chat(){
                     </div>
                 </div>:
                 <div className="column has-background-white is-flex is-flex-direction-column borders full-height">
-                    <h1>Ad Banner</h1>
+                    {/* Right side header */}
+                    <div className="is-flex is-justify-content-space-between border-bottom">
+                        <div className="is-flex">
+                            <button className="button mr-3 is-hidden-desktop" onClick={() => setLeftModal(true)}>
+                                <span className="icon">
+                                    <i className="fas fa-bars"></i>
+                                </span>
+                            </button>                                      
+                            <div className="is-flex is-flex-direction-column ml-2">
+                                <span className="has-text-weight-bold custom-font">Welcome To Ink</span>
+                            </div>
+                        </div>
+                        <div className="is-flex">
+                            <button className="button mx-1 has-background-danger" onClick={logoutUser}>
+                                <span className="icon">
+                                    {/* <i className="fa-solid fa-bars"></i> */}
+                                    <i class="fa-solid fa-right-from-bracket has-text-white"></i>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             }
         </div>
