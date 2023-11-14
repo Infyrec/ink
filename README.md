@@ -4,6 +4,10 @@ Project & Branch Details
 
 Main branch contains frontend code built using react
 
-### `auth branch`
+### `authentication branch`
 
-Auth branch contains authentication server code
+Authentication branch contains authentication server code
+
+### `connection branch`
+
+Connection branch contains socket server code
