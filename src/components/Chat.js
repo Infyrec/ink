@@ -38,11 +38,10 @@ export default function Chat(){
 
     // To auto scroll
     useEffect(() => {
-        if(message.length > 0){
+        if(message.length > 0 && focused != null){
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
     }, [message])
-
 
     // To update as online ----->
     function loginAndUpdates(){
