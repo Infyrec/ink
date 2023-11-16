@@ -26,6 +26,7 @@ export default function Chat(){
     let [focused, setFocused] = useState(null)
     let [written, setWritten] = useState(null)
     let [message, setMessage] = useState([]) //{type: 'post', time: null, name: 'Ragul', message: 'Hello'}
+    let [unread, setUnread] = useState([])
 
     // To check the authorization & initialization
     useEffect(() => {
@@ -42,6 +43,20 @@ export default function Chat(){
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
     }, [message])
+
+    // To receive unread message and update it.
+    useEffect(() => {
+        let temp = unread[unread.length - 1]
+        if(focused != null && focused.username == temp.name){
+            setMessage(prev => [...prev, {
+                ...prev,
+                type: 'get', 
+                time: currentTime(), 
+                name: temp.username, 
+                message: temp.message
+            }])
+        }
+    }, [unread])
 
     // To update as online ----->
     function loginAndUpdates(){
@@ -65,7 +80,7 @@ export default function Chat(){
     
                 // Receive message from peer
                 socket.current.on('received-msg', (payload) => {
-                    setMessage(prev => [...prev, {
+                    setUnread(prev => [...prev, {
                         ...prev,
                         type: 'get', 
                         time: currentTime(), 
@@ -292,7 +307,9 @@ export default function Chat(){
                 <div className="is-flex-grow-1 contact-list" style={{overflowY: "auto"}}>
                     {
                         activeUsers.map((active) => (
-                            <a className="panel-block custom-font" onClick={() => setFocused(active)}>
+                            <a className="panel-block custom-font" onClick={() => {
+                                setFocused(active)
+                            }}>
                                 <img className="profile" src={require('./assets/avatar.png')}/>                                            
                                 <div className="is-flex is-flex-direction-column ml-2">
                                     <span className="has-text-weight-bold custom-font">{active.username}</span>
