@@ -44,19 +44,37 @@ export default function Chat(){
         }
     }, [message])
 
-    // To receive unread message and update it.
+    // To receive and set the message.
     useEffect(() => {
         let temp = unread[unread.length - 1]
-        if(focused != null && focused.username == temp.name){
+        if(focused != null && unread.length > 0 && focused.username == temp.name){
             setMessage(prev => [...prev, {
                 ...prev,
-                type: 'get', 
-                time: currentTime(), 
+                type: temp.type, 
+                time: temp.time, 
                 name: temp.username, 
                 message: temp.message
             }])
         }
     }, [unread])
+
+    // To fetch unread message base on user
+    useEffect(() => {
+        setMessage([])
+        unread.map((msg) => {
+            if(focused != null && unread.length > 0 && focused.username == msg.name){
+                setMessage(prev => [...prev, {
+                    ...prev,
+                    type: msg.type, 
+                    time: msg.time, 
+                    name: msg.username, 
+                    message: msg.message
+                }])
+            }
+        })
+
+        setUnread(unread.filter(item => item.name != focused.username))
+    }, [focused])
 
     // To update as online ----->
     function loginAndUpdates(){
