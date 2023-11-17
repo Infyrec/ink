@@ -66,14 +66,16 @@ export default function Chat(){
     
                 // Receive message from peer
                 socket.current.on('received-msg', (payload) => {
-                    //inkdb.add(payload.username, {...payload, time: currentTime()})
-                    setMessage(prev => [...prev, {
-                        ...prev,
+
+                    let msgFormat = {
                         type: 'get', 
                         time: currentTime(), 
-                        name: payload.username, 
+                        name: payload.username,  
                         message: payload.message
-                    }])
+                    }
+
+                    inkdb.add(payload.username, msgFormat)
+                    setMessage(prev => [...prev, msgFormat])
                 })
 
                 // Triggers when new user join
@@ -230,24 +232,27 @@ export default function Chat(){
                 username: username
             }
 
-            setMessage(prev => [...prev, {
-                ...prev,
+            let msgFormat = {
                 type: 'post', 
                 time: currentTime(), 
                 name: username, 
                 message: written
-            }])
+            }
+
+            inkdb.add(focused.username, msgFormat)
+
+            setMessage(prev => [...prev, msgFormat])
 
             socket.current.emit('send-msg', payload)
             setWritten('')
         }
     }
 
-    // To change contact and get message
-    async function getMessages(data){
-        setFocused(data)
-        let result = await inkdb.get(data.username)
-        console.log(result);
+    // To fetch the message from DB
+    async function fetchMessage(user){
+        setFocused(user)
+        let result = await inkdb.get(user.username)
+        setMessage(result)
     }
 
     return(
@@ -301,7 +306,7 @@ export default function Chat(){
                 <div className="is-flex-grow-1 contact-list" style={{overflowY: "auto"}}>
                     {
                         activeUsers.map((active) => (
-                            <a className="panel-block custom-font" onClick={() => getMessages(active)}>
+                            <a className="panel-block custom-font" onClick={() => fetchMessage(active)}>
                                 <img className="profile" src={require('./assets/avatar.png')}/>                                            
                                 <div className="is-flex is-flex-direction-column ml-2">
                                     <span className="has-text-weight-bold custom-font">{active.username}</span>
@@ -464,7 +469,7 @@ export default function Chat(){
                         {
                             activeUsers.map((active) => (
                                 <a className="panel-block custom-font" onClick={() => {
-                                    getMessages(active)
+                                    fetchMessage(active)
                                     setLeftModal(false)
                                 }}>
                                     <img className="profile" src={require('./assets/avatar.png')}/>                                            

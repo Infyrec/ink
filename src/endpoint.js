@@ -1,4 +1,4 @@
 export let serve = {
-    authentication: 'http://192.168.0.131:3001',
-    communication: 'http://192.168.0.131:3002'
+    authentication: 'http://192.168.0.213:3001',
+    communication: 'http://192.168.0.213:3002'
 }
