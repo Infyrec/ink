@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { io } from "socket.io-client";
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { useGlobalVariable } from './GlobalVariable';
+import { inkdb } from './inkdb';
 
 let endpoint = serve.authentication // Authentication server
 let connection = serve.communication // Socket server
@@ -26,7 +27,6 @@ export default function Chat(){
     let [focused, setFocused] = useState(null)
     let [written, setWritten] = useState(null)
     let [message, setMessage] = useState([]) //{type: 'post', time: null, name: 'Ragul', message: 'Hello'}
-    let [unread, setUnread] = useState([])
 
     // To check the authorization & initialization
     useEffect(() => {
@@ -43,38 +43,6 @@ export default function Chat(){
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
     }, [message])
-
-    // To receive and set the message.
-    useEffect(() => {
-        let temp = unread[unread.length - 1]
-        if(focused != null && unread.length > 0 && focused.username == temp.name){
-            setMessage(prev => [...prev, {
-                ...prev,
-                type: temp.type, 
-                time: temp.time, 
-                name: temp.username, 
-                message: temp.message
-            }])
-        }
-    }, [unread])
-
-    // To fetch unread message base on user
-    useEffect(() => {
-        setMessage([])
-        unread.map((msg) => {
-            if(focused != null && unread.length > 0 && focused.username == msg.name){
-                setMessage(prev => [...prev, {
-                    ...prev,
-                    type: msg.type, 
-                    time: msg.time, 
-                    name: msg.username, 
-                    message: msg.message
-                }])
-            }
-        })
-
-        setUnread(unread.filter(item => item.name != focused.username))
-    }, [focused])
 
     // To update as online ----->
     function loginAndUpdates(){
@@ -98,7 +66,8 @@ export default function Chat(){
     
                 // Receive message from peer
                 socket.current.on('received-msg', (payload) => {
-                    setUnread(prev => [...prev, {
+                    //inkdb.add(payload.username, {...payload, time: currentTime()})
+                    setMessage(prev => [...prev, {
                         ...prev,
                         type: 'get', 
                         time: currentTime(), 
@@ -274,6 +243,13 @@ export default function Chat(){
         }
     }
 
+    // To change contact and get message
+    async function getMessages(data){
+        setFocused(data)
+        let result = await inkdb.get(data.username)
+        console.log(result);
+    }
+
     return(
     <section className="hero is-fullheight">
         <div className="columns m-0">
@@ -325,9 +301,7 @@ export default function Chat(){
                 <div className="is-flex-grow-1 contact-list" style={{overflowY: "auto"}}>
                     {
                         activeUsers.map((active) => (
-                            <a className="panel-block custom-font" onClick={() => {
-                                setFocused(active)
-                            }}>
+                            <a className="panel-block custom-font" onClick={() => getMessages(active)}>
                                 <img className="profile" src={require('./assets/avatar.png')}/>                                            
                                 <div className="is-flex is-flex-direction-column ml-2">
                                     <span className="has-text-weight-bold custom-font">{active.username}</span>
@@ -490,7 +464,7 @@ export default function Chat(){
                         {
                             activeUsers.map((active) => (
                                 <a className="panel-block custom-font" onClick={() => {
-                                    setFocused(active) 
+                                    getMessages(active)
                                     setLeftModal(false)
                                 }}>
                                     <img className="profile" src={require('./assets/avatar.png')}/>                                            
