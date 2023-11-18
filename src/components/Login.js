@@ -2,7 +2,6 @@ import './styles/authen.css'
 import 'aos/dist/aos.css';
 import login from './assets/elogin.svg'
 
-import { serve } from '../endpoint';
 import { Link, useNavigate } from "react-router-dom"
 import { z } from "zod";
 import AOS from 'aos';
@@ -15,7 +14,7 @@ const credSchema = z.object({
     password: z.string().min(8)
 })
 
-let endpoint = serve.authentication
+let endpoint = process.env.REACT_APP_AUTHENTICATION
 
 export default function Login(){
 

@@ -2,14 +2,13 @@ import './styles/authen.css'
 import 'aos/dist/aos.css';
 import login from './assets/elogin.svg'
 
-import { serve } from '../endpoint';
 import { Link, useNavigate } from "react-router-dom"
 import { z } from "zod";
 import AOS from 'aos';
 import axios from 'axios';
 import React, { useEffect, useState, useContext } from "react";
 
-let endpoint = serve.authentication
+let endpoint = process.env.REACT_APP_AUTHENTICATION
 
 const credSchema = z.object({
     username: z.string().min(3),

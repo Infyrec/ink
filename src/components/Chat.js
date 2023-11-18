@@ -1,15 +1,14 @@
 import './styles/chat.css';
 
 import axios from 'axios';
-import { serve } from '../endpoint';
 import { useNavigate } from 'react-router-dom'
 import { io } from "socket.io-client";
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { useGlobalVariable } from './GlobalVariable';
 import { inkdb } from './inkdb';
 
-let endpoint = serve.authentication // Authentication server
-let connection = serve.communication // Socket server
+let endpoint = process.env.REACT_APP_AUTHENTICATION // Authentication server
+let connection = process.env.REACT_APP_CONNECTION // Socket server
 
 export default function Chat(){
 
