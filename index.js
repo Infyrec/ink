@@ -11,14 +11,14 @@ const io = new Server(httpServer, {
     }
 });
 require('dotenv').config()
-const RefModel = require('./schema/RefModel')
+const RefModel = require('./schema/refModel')
 const DataModel = require('./schema/dataModel');
 
 app.use(cors())
 
-const dbConnection = process.env.DATABASE_URL
-
-mongoose.connect(dbConnection);
+//const dbConnect = process.env.DATABASE_URL
+const dbConnect = process.env.dburl
+mongoose.connect(dbConnect);
 const database = mongoose.connection
 
 database.once('connected', () => {
