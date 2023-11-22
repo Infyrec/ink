@@ -7,9 +7,14 @@ Frontend Code:
 - React
 
 ### `🌿 authentication branch 🌿`
-
-Authentication branch contains authentication server code
+Backend Code:
+- Express.js
+- JWT
+- Mongoose
+- Bcrypt
 
 ### `🌿 connection branch 🌿`
-
-Connection branch contains socket server code
+Backend Code:
+- Express.js
+- Mongoose
+- Socket.io
