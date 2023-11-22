@@ -1,4 +1,4 @@
-Project & Branch Details
+## Project & Branch Details
 
 ### `main branch`
 
