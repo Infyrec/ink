@@ -9,6 +9,8 @@ import { inkdb } from './inkdb';
 
 let endpoint = process.env.REACT_APP_AUTHENTICATION // Authentication server
 let connection = process.env.REACT_APP_CONNECTION // Socket server
+let chunkSize = 1024 * 1024
+let offset = 0
 
 export default function Chat(){
 
@@ -70,11 +72,19 @@ export default function Chat(){
                         type: 'get', 
                         time: currentTime(), 
                         name: payload.username,  
-                        message: payload.message
+                        message: {
+                            type: 'text',
+                            message: payload.message
+                        }
                     }
 
                     inkdb.add(payload.username, msgFormat)
                     setMessage(prev => [...prev, msgFormat])
+                })
+
+                // Receive media buffer from peer
+                socket.current.on('received-buffer', (data) => {
+                    console.log(data.layer, data.buffer);
                 })
 
                 // Triggers when new user join
@@ -235,7 +245,10 @@ export default function Chat(){
                 type: 'post', 
                 time: currentTime(), 
                 name: username, 
-                message: written
+                message: {
+                    type: 'text',
+                    message: written
+                }
             }
 
             inkdb.add(focused.username, msgFormat)
@@ -245,6 +258,24 @@ export default function Chat(){
             socket.current.emit('send-msg', payload)
             setWritten('')
         }
+    }
+
+    // To read file
+    function readFile(e){
+        let { username, email } = JSON.parse(localStorage.getItem('ink-user'))
+        let selectedFile = e.target.files[0]
+        while(offset < selectedFile.size){
+            let chunk = selectedFile.slice(offset, offset + chunkSize)
+            let payload = {
+                layer: offset,
+                sendTo: focused.email,
+                username: username,
+                buffer: chunk
+            }
+            socket.current.emit('send-buffer', payload)
+            offset += chunkSize
+        }
+        offset = 0
     }
 
     // To fetch the message from DB
@@ -359,9 +390,9 @@ export default function Chat(){
                         {
                             message.map((data) => (
                                 data.type == 'post'?
-                                <SentMessage name={data.name} time={data.time} message={data.message}/>:
+                                <SentMessage name={data.name} time={data.time} message={data.message.message}/>:
                                 data.type == 'get'?
-                                <ReceivedMessage name={data.name} time={data.time} message={data.message}/>:
+                                <ReceivedMessage name={data.name} time={data.time} message={data.message.message}/>:
                                 null
                             ))
                         }
@@ -374,8 +405,11 @@ export default function Chat(){
                             </p>
                         </div>
                         <div className="button mx-1">
-                            <span className="icon is-small mx-1" onClick={notEnabled}>
-                                <i className="fa-solid fa-image"></i>
+                            <span className="icon is-small mx-1">
+                                <label>
+                                    <i className="fa-solid fa-image"></i>
+                                    <input type='file' style={{display: "none"}} onChange={(e) => readFile(e)}/>
+                                </label>
                             </span>
                             <span className="icon is-small mx-1" onClick={notEnabled}>
                                 <i className="fa-solid fa-location-dot"></i>
