@@ -17,7 +17,7 @@ const DataModel = require('./schema/dataModel');
 app.use(cors())
 
 //const dbConnect = process.env.DATABASE_URL
-const dbConnect = process.env.dburl
+const dbConnect = process.env.DATABASE_URL
 mongoose.connect(dbConnect);
 const database = mongoose.connection
 
@@ -55,6 +55,20 @@ io.on("connection", (socket) => {
         
         if(result){
             io.to(result.sockid).emit('received-msg', data)
+        }
+    }
+    catch(e){
+        console.log(e);
+    }
+  })
+
+  // To send media buffers
+  socket.on('send-buffer', async(data) => {
+    try{
+        let result = await DataModel.findOne({ email: data.sendTo }).exec();
+        
+        if(result){
+            io.to(result.sockid).emit('received-buffer', data)
         }
     }
     catch(e){
