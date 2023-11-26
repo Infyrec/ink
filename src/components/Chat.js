@@ -9,8 +9,9 @@ import { inkdb } from './inkdb';
 
 let endpoint = process.env.REACT_APP_AUTHENTICATION // Authentication server
 let connection = process.env.REACT_APP_CONNECTION // Socket server
-let chunkSize = 1024 * 1024
+let chunkSize = 1024 * 900
 let offset = 0
+let sequence = 0
 
 export default function Chat(){
 
@@ -267,15 +268,18 @@ export default function Chat(){
         while(offset < selectedFile.size){
             let chunk = selectedFile.slice(offset, offset + chunkSize)
             let payload = {
-                layer: offset,
+                layer: sequence,
                 sendTo: focused.email,
                 username: username,
                 buffer: chunk
             }
             socket.current.emit('send-buffer', payload)
             offset += chunkSize
+            sequence++
         }
         offset = 0
+        sequence = 0
+        socket.current.emit('send-buffer', {layer: 'end'})
     }
 
     // To fetch the message from DB
@@ -369,6 +373,11 @@ export default function Chat(){
                         <div className="is-flex">
                             <button className="button mx-1" onClick={notEnabled}>
                                 <span className="icon">
+                                    <i className="fas fa-display"></i>
+                                </span>
+                            </button>
+                            <button className="button mx-1" onClick={notEnabled}>
+                                <span className="icon">
                                     <i className="fas fa-video"></i>
                                 </span>
                             </button>
@@ -407,7 +416,7 @@ export default function Chat(){
                         <div className="button mx-1">
                             <span className="icon is-small mx-1">
                                 <label>
-                                    <i className="fa-solid fa-image"></i>
+                                    <i className="fa-solid fa-paperclip"></i>
                                     <input type='file' style={{display: "none"}} onChange={(e) => readFile(e)}/>
                                 </label>
                             </span>
