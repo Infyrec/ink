@@ -1,4 +1,27 @@
+import React, { useState } from 'react';
+import axios from 'axios';
+
 export default function Leftside(){
+    const [file, setFile] = useState(null);
+    
+    const handleUpload = async (e) => {
+        const formData = new FormData();
+        formData.append('file', e.target.files[0]);
+    
+        try {
+          const response = await axios.post('http://localhost:3002/upload', formData, {
+            onUploadProgress: (progressEvent) => {
+              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              console.log(`Upload progress: ${percentCompleted}%`);
+            },
+          });
+    
+          console.log(response.data);
+        } catch (error) {
+          console.error('Error uploading file:', error);
+        }
+    }
+
     return(
         <div className="column is-one-fifth full-height custom-border is-flex is-flex-direction-column is-hidden-touch">
             <div className="is-flex is-justify-content-center my-4">
@@ -26,12 +49,15 @@ export default function Leftside(){
                             </a>
                         </li>
                         <li>
-                            <a className="custom-font">
-                                <span className="icon">
-                                    <i className="fas fa-upload"></i>
-                                </span>
-                                Upload
-                            </a>
+                            <label>
+                                <a className="custom-font">
+                                    <span className="icon">
+                                        <i className="fas fa-upload"></i>
+                                        <input type='file' style={{display: "none"}} onChange={handleUpload}/>
+                                    </span>
+                                    Upload
+                                </a>
+                            </label>
                         </li>
                         <li>
                             <a className="custom-font">

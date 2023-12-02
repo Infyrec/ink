@@ -9,8 +9,8 @@ export default function Router(){
     return(
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<Login />}/>
-                <Route path="/mycloud" element={<Landing />}/>
+                <Route path="/" element={<Landing />}/>
+                <Route path="/login" element={<Login />}/>
                 <Route path="/signup" element={<Signup />}/>
                 <Route path="/chat" element={<Chat />}/>
             </Routes>
