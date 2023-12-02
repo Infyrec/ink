@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+import { useGlobalVariable } from '../GlobalVariable';
+
 export default function Leftside(){
-    const [file, setFile] = useState(null);
+    let { uploadProgress, setUploadProgress } = useGlobalVariable()
+    const [file, setFile] = useState(null)
     
     const handleUpload = async (e) => {
         const formData = new FormData();
@@ -12,6 +15,7 @@ export default function Leftside(){
           const response = await axios.post('http://localhost:3002/upload', formData, {
             onUploadProgress: (progressEvent) => {
               const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              setUploadProgress(percentCompleted)
               console.log(`Upload progress: ${percentCompleted}%`);
             },
           });

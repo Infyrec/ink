@@ -8,9 +8,10 @@ export function useGlobalVariable(){
 
 export function GlobalVariable({ children }){
     let [email, updateEmail] = useState(null)
+    let [uploadProgress, setUploadProgress] = useState(0)
 
     return(
-        <GlobalStore.Provider value={{ email, updateEmail }}>
+        <GlobalStore.Provider value={{ email, updateEmail, uploadProgress, setUploadProgress }}>
             {children}
         </GlobalStore.Provider>
     )

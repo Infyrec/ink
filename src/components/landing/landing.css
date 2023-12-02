@@ -26,10 +26,6 @@ html, body{
     border: 1px solid #f6f8fc;
 }
 
-.bottom-line{
-    border-bottom: 1px solid rgb(227, 227, 227);
-}
-
 .card-one{
     background-image: linear-gradient(to right top, #ff0000, #ff0044, #fb0075, #de00a3, #ab1dc9, #8458e8, #537af9, #0093ff, #00bbff, #00dafe, #00f1a8, #00ff0b);
 }
