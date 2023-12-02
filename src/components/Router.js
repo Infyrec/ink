@@ -1,5 +1,6 @@
 import Login from "./Login";
 import Signup from "./Signup";
+import Landing from "./landing/Landing";
 import Chat from "./Chat";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -9,6 +10,7 @@ export default function Router(){
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<Login />}/>
+                <Route path="/mycloud" element={<Landing />}/>
                 <Route path="/signup" element={<Signup />}/>
                 <Route path="/chat" element={<Chat />}/>
             </Routes>

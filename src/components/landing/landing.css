@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+html, body{
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+.full-height{
+    height: 100vh;
+}
+
+.custom-color{
+    background-color: #2563eb;
+}
+
+.custom-font{
+    font-family: 'Poppins', sans-serif;
+}
+
+.menu-list a.is-active{
+    background-color: #2563eb;
+}
+
+.custom-border{
+    border: 1px solid #f6f8fc;
+}
+
+.bottom-line{
+    border-bottom: 1px solid rgb(227, 227, 227);
+}
+
+.card-one{
+    background-image: linear-gradient(to right top, #ff0000, #ff0044, #fb0075, #de00a3, #ab1dc9, #8458e8, #537af9, #0093ff, #00bbff, #00dafe, #00f1a8, #00ff0b);
+}
+
+.card-two{
+    background-image: linear-gradient(to left bottom, #deff00, #ffc400, #ff7c3a, #ff1f81, #ff00c5, #cd20c0, #9c2ab6, #6a2da6, #64176d, #4c0f3f, #2c0d1e, #000000);
+}
+
+.card-three{
+    background-image: linear-gradient(to left top, #002dff, #6427ff, #8f20ff, #b117ff, #cf0cff, #ad57ff, #8f75ff, #7c89ff, #2da7ff, #00c1ff, #00d6ff, #00e9ff);
+}
+
+.card-four{
+    background-image: linear-gradient(to left top, #000000, #340f20, #5f0d41, #8a026d, #b000a4, #ad13ba, #a624d1, #9834e9, #6f3cd4, #493ebb, #263aa0, #003483);
+}
