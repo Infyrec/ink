@@ -1,36 +1,15 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 
-import { useGlobalVariable } from '../GlobalVariable';
+import { useUploadAgent } from './UploadAgent';
 
 export default function Leftside(){
-    let { uploadProgress, setUploadProgress } = useGlobalVariable()
-    const [file, setFile] = useState(null)
-    
-    const handleUpload = async (e) => {
-        const formData = new FormData();
-        formData.append('file', e.target.files[0]);
-    
-        try {
-          const response = await axios.post('http://localhost:3002/upload', formData, {
-            onUploadProgress: (progressEvent) => {
-              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-              setUploadProgress(percentCompleted)
-              console.log(`Upload progress: ${percentCompleted}%`);
-            },
-          });
-    
-          console.log(response.data);
-        } catch (error) {
-          console.error('Error uploading file:', error);
-        }
-    }
+    let { uploadProgress, uploadFile } = useUploadAgent()
 
     return(
         <div className="column is-one-fifth full-height custom-border is-flex is-flex-direction-column is-hidden-touch">
             <div className="is-flex is-justify-content-center my-4">
                 <figure className="image is-128x128">
-                    <img className="is-rounded" src="https://bulma.io/images/placeholders/128x128.png" />
+                    <img className="is-rounded" src={require('../assets/Ragul.jpg')}/>
                 </figure>
             </div>
             <div className="is-flex-grow-1 my-4">
@@ -57,7 +36,7 @@ export default function Leftside(){
                                 <a className="custom-font">
                                     <span className="icon">
                                         <i className="fas fa-upload"></i>
-                                        <input type='file' style={{display: "none"}} onChange={handleUpload}/>
+                                        <input type='file' style={{display: "none"}} onChange={uploadFile}/>
                                     </span>
                                     Upload
                                 </a>
@@ -95,10 +74,6 @@ export default function Leftside(){
                         </li>
                     </ul>
                 </aside>
-                <div className="my-3 mx-4">
-                    <p className="custom-font is-size-7">15 GB of 100 GB Used</p>
-                    <progress className="progress is-primary" value="15" max="100">15%</progress>
-                </div>
             </div>
         </div>
     )

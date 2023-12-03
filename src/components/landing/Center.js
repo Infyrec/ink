@@ -1,6 +1,46 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+import { useUploadAgent } from './UploadAgent';
+let storage = process.env.REACT_APP_STORAGE
 
 export default function Center(){
+    let { uploadProgress, uploadFile, trigger } = useUploadAgent()
+    let [fileList, setFileList] = useState([])
+
+    useEffect(() => {
+        // To get list of files
+        axios.get(`${storage}/readdisk`)
+        .then((res) => {
+            setFileList(res.data.files)
+            console.log(fileList);
+        })
+        .catch((e) => {
+            console.log('Error: ' + e);
+        })
+    }, [trigger])
+
+
+    function FileDataList(props){
+        let { name, type, size } = props
+        return(
+            <tr>
+                <td>
+                    <span className="icon"><i className="fas fa-image" aria-hidden="true"></i></span>
+                    <span className="custom-font is-size-6">{name}</span>
+                </td>
+                <td className="custom-font">{type}</td>
+                <td className="custom-font">{size}</td>
+                <td>
+                    <a><span className="icon"><i className="fas fa-share-nodes" aria-hidden="true"></i></span></a>
+                </td>
+                <td>
+                    <a><span className="icon"><i className="fas fa-ellipsis" aria-hidden="true"></i></span></a>
+                </td>
+            </tr>
+        )
+    }
+
     return(
         <div className="column full-height custom-border">
             {/* Search bar */}
@@ -21,13 +61,16 @@ export default function Center(){
                             </span>
                         </button>
                         <button className="button is-hidden-touch">
-                            <span className="icon">
-                                <i className="fa-solid fa-upload"></i>
-                            </span>
+                            <label>
+                                <span className="icon">
+                                    <i className="fa-solid fa-upload"></i>
+                                    <input type='file' style={{display: "none"}} onChange={uploadFile}/>
+                                </span>
+                            </label>
                         </button>
-                        <button className="button">
+                        <button className="button is-primary">
                             <span className="icon">
-                                <i className="fa-solid fa-bars"></i>
+                                <i className="fa-solid fa-hard-drive has-text-white"></i>
                             </span>
                         </button>
                     </p>
@@ -48,34 +91,11 @@ export default function Center(){
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>
-                                <span className="icon"><i className="fas fa-image" aria-hidden="true"></i></span>
-                                <span className="custom-font is-size-6">Ragul</span>
-                            </td>
-                            <td className="custom-font">PNG file</td>
-                            <td className="custom-font">5 MB</td>
-                            <td>
-                                <a><span className="icon"><i className="fas fa-share-nodes" aria-hidden="true"></i></span></a>
-                            </td>
-                            <td>
-                                <a><span className="icon"><i className="fas fa-ellipsis" aria-hidden="true"></i></span></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span className="icon"><i className="fas fa-image" aria-hidden="true"></i></span>
-                                <span className="custom-font is-size-6">Ragul</span>
-                            </td>
-                            <td className="custom-font">PNG file</td>
-                            <td className="custom-font">5 MB</td>
-                            <td>
-                                <a><span className="icon"><i className="fas fa-share-nodes" aria-hidden="true"></i></span></a>
-                            </td>
-                            <td>
-                                <a><span className="icon"><i className="fas fa-ellipsis" aria-hidden="true"></i></span></a>
-                            </td>
-                        </tr>
+                        {
+                            fileList.map((data) => (
+                                <FileDataList name={data.name} type={data.type} size={data.size} />
+                            ))
+                        }
                     </tbody>
                 </table>
             </div>
