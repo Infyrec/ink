@@ -90,7 +90,7 @@ app.get('/activeusers', async(req, res) => {
 })
 
 
-httpServer.listen(3002, () => console.log('Socket server started at 3002'));
+httpServer.listen(3003, () => console.log('Socket server started at 3003'));
 
 
 // To update online status on the database.
