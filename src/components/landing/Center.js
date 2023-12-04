@@ -68,11 +68,6 @@ export default function Center(){
                                 </span>
                             </label>
                         </button>
-                        <button className="button is-primary">
-                            <span className="icon">
-                                <i className="fa-solid fa-hard-drive has-text-white"></i>
-                            </span>
-                        </button>
                     </p>
                 </div>
             </div>

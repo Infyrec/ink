@@ -1,7 +1,7 @@
 import Login from "./Login";
 import Signup from "./Signup";
 import Landing from "./landing/Landing";
-import Chat from "./Chat";
+import Chat from "./chat/Chat";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-
+import { useNavigate } from 'react-router-dom'
 import { useUploadAgent } from './UploadAgent';
 
 export default function Leftside(){
+    let navigate = useNavigate()
     let { uploadProgress, uploadFile } = useUploadAgent()
 
     return(
@@ -65,7 +66,7 @@ export default function Leftside(){
                             </a>
                         </li>
                         <li>
-                            <a className="custom-font">
+                            <a className="custom-font" onClick={() => navigate('/login')}>
                                 <span className="icon">
                                     <i className="fas fa-right-from-bracket"></i>
                                 </span>

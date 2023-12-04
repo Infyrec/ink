@@ -41,7 +41,7 @@ export default function Login(){
               .then((res) => {
                     let { username, email } = res.data.userdata
                     localStorage.setItem('ink-user', JSON.stringify({username, email}))
-                    navigate('/chat')             
+                    navigate('/')             
               })
               .catch((err) => {
                 setError({

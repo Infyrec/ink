@@ -65,7 +65,7 @@ export default function Signup(){
               .then((res) => {
                 let status = res.data.status
                 if(status == 'success'){
-                    navigate('/')
+                    navigate('/login')
                 }                
               })
               .catch((err) => {
