@@ -18,7 +18,6 @@ export default function Rightside(){
         // To get/fetch disk space
         axios.get(`${storage}/diskspace`)
         .then((res) => {
-            console.log(res.data);
             setDiskSpace({
                 free: Math.round(res.data.free),
                 size: Math.round(res.data.size)

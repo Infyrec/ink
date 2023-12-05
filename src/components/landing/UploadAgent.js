@@ -5,6 +5,8 @@ let storage = process.env.REACT_APP_STORAGE
 
 let UploadContext = createContext()
 
+let metadata = null
+
 export function useUploadAgent(){
     return useContext(UploadContext)
 }
@@ -14,6 +16,20 @@ export function UploadAgent({ children }){
     let [trigger, setTrigger] = useState(0)
 
     const uploadFile = async (e) => {
+      try{
+        metadata = {
+          uid: new Date().getTime(),
+          file: e.target.files[0].name,
+          size: parseInt(e.target.files[0].size / 1024**2) + ' MB',
+          type: e.target.files[0].type,
+          date: new Date().getDate().toString() + '/' + parseInt(new Date().getMonth()+1).toString() + '/' + new Date().getFullYear(),
+          location: '/',
+          meta: {
+            lastModified: e.target.files[0].lastModified,
+            lastModifiedDate: e.target.files[0].lastModifiedDate
+          }
+        }
+  
         const formData = new FormData();
         formData.append('file', e.target.files[0]);
     
@@ -27,16 +43,26 @@ export function UploadAgent({ children }){
           });
     
           if(response.data.status == 'success'){
-            setTrigger(prev => prev + 1)
-            console.log('File uploaded successfully...!');
+            axios.post(`${storage}/registerUpload`, metadata)
+            .then((res) => {
+              setTrigger(prev => prev + 1)
+              console.log('File uploaded successfully...!');
+            })
+            .catch((err) => {
+              console.log(err);
+            })
           }
         } catch (error) {
           console.error('Error uploading file:', error);
         }
+      }
+      catch(e){
+        console.log('File not selected to upload.');
+      }
     }
 
     return(
-        <UploadContext.Provider value={{ uploadProgress, uploadFile, trigger }}>
+        <UploadContext.Provider value={{ uploadProgress, uploadFile, trigger, setTrigger }}>
             {children}
         </UploadContext.Provider>
     )

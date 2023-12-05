@@ -5,13 +5,13 @@ import { useUploadAgent } from './UploadAgent';
 let storage = process.env.REACT_APP_STORAGE
 
 export default function Center(){
-    let { uploadProgress, uploadFile, trigger } = useUploadAgent()
+    let { uploadProgress, uploadFile, trigger, setTrigger } = useUploadAgent()
     let [fileList, setFileList] = useState([])
     let [toolTip, setToolTip] = useState(false)
 
     useEffect(() => {
         // To get list of files
-        axios.get(`${storage}/readdisk`)
+        axios.get(`${storage}/readfiles`)
         .then((res) => {
             setFileList(res.data.files)
         })
@@ -20,34 +20,46 @@ export default function Center(){
         })
     }, [trigger])
 
+    function downloadRequest(prop){
+        setToolTip(!toolTip)
+        window.open(`${storage}/download/?file=${prop.file}`)
+    }
+
+    function deleteRequest(prop){
+        setToolTip(!toolTip)
+        axios.post(`${storage}/delete`, prop)
+        .then((res) => {
+            console.log('File deleted successfully.');
+            setTrigger(prev => prev + 1)
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+    }
 
     function FileDataList(props){
-        let { name, type, size } = props
+        let { uid, file, type, size } = props
         return(
             <tr>
                 <td>
-                    <span className="icon"><i className="fas fa-image" aria-hidden="true"></i></span>
-                    <span className="custom-font is-size-6">{name}</span>
-                </td>
-                <td className="custom-font">{type}</td>
-                <td className="custom-font">{size}</td>
-                <td>
-                    <a><span className="icon"><i className="fas fa-share-nodes" aria-hidden="true"></i></span></a>
+                    <p className="custom-font is-size-6 has-text-centered">{file}</p>
                 </td>
                 <td>
-                    <a onClick={() => setToolTip(!toolTip)}><span className="icon"><i className="fas fa-ellipsis" aria-hidden="true"></i></span></a>
-                    <span className={`card is-flex is-flex-direction-column mt-2 ${toolTip ? 'is-visible':'is-hidden'}`}>
-                        <aside className="menu">
-                            <ul className="menu-list">
-                                <li>
-                                    <a><i className="custom-font is-size-7">Download</i></a>
-                                </li>
-                                <li>
-                                    <a><i className="custom-font is-size-7">Delete</i></a>
-                                </li>
-                            </ul>
-                        </aside>
-                    </span>
+                    <p className="custom-font is-size-6 has-text-centered">{type.split('/')[1]}</p>
+                </td>
+                <td>
+                    <p className="custom-font is-size-6 has-text-centered">{size}</p>
+                </td>
+                <td>
+                    <p className="has-text-centered">
+                        <a className="mx-2"><span className="icon"><i className="fas fa-share-nodes" aria-hidden="true"></i></span></a>
+                        <a onClick={() => downloadRequest(props)} className="mx-2">
+                            <span className="icon"><i className="fas fa-download" aria-hidden="true"></i></span>
+                        </a>
+                        <a onClick={() => deleteRequest(props)} className="mx-2">
+                            <span className="icon"><i className="fas fa-trash" aria-hidden="true"></i></span>
+                        </a>
+                    </p>
                 </td>
             </tr>
         )
@@ -90,17 +102,16 @@ export default function Center(){
                 <table className="table is-striped is-fullwidth">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Type</th>
-                            <th>Size</th>
-                            <th>Share</th>
-                            <th>Detail</th>
+                            <th className="has-text-centered">Name</th>
+                            <th className="has-text-centered">Type</th>
+                            <th className="has-text-centered">Size</th>
+                            <th className="has-text-centered">Options</th>
                         </tr>
                     </thead>
                     <tbody>
                         {
                             fileList.map((data) => (
-                                <FileDataList name={data.name} type={data.type} size={data.size} />
+                                <FileDataList uid={data.uid} file={data.file} type={data.type} size={data.size} />
                             ))
                         }
                     </tbody>
