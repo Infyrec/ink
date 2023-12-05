@@ -83,6 +83,10 @@ app.post('/upload', upload.single('file'), (req, res) => {
   res.status(200).json({status: 'success', message: 'File uploaded successfully'});
 });
 
+app.get('/download', (req, res) => {
+  res.send('Download route')
+})
+
 
 // Start server
 app.listen(3002, () => {
