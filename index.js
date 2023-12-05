@@ -1,12 +1,28 @@
 const checkDiskSpace = require('check-disk-space').default
-const fs = require('fs');
-const path = require('path');
+const fs = require('fs').promises;
 const express = require('express');
 const multer = require('multer');
-const cors = require('cors')
-const app = express();
+const cors = require('cors');
+const mongoose = require('mongoose');
+require('dotenv').config()
 
+const FileModel = require('./schema/fileModel');
+
+const app = express();
 app.use(cors())
+app.use(express.json())
+
+const dbConnect = process.env.DATABASE_URL
+mongoose.connect(dbConnect);
+const database = mongoose.connection
+
+database.once('connected', () => {
+    console.log('Database Connected');
+})
+
+database.on('error', (error) => {
+    console.log(error)
+})
 
 // Multer storage configuration
 const storage = multer.diskStorage({
@@ -41,36 +57,10 @@ app.get('/diskspace', (req, res) => {
 })
 
 // To read folder/files
-app.get('/readdisk', (req, res) => {
+app.get('/readfiles', async(req, res) => {
   try{
-    let collection = []
-
-    let waiter = new Promise((resolve, reject) => {
-      fs.readdir(__dirname+'/uploads', (err, files) => {
-        files.forEach(file => {
-    
-          let fileDetails = fs.lstatSync(path.resolve(__dirname+'/uploads', file));
-    
-          if (fileDetails.isDirectory()) {
-            console.log('Directory: ' + file);
-            console.log('Details: ' + JSON.stringify(fileDetails));
-          } 
-          else {
-            let metadata = {
-              name: file.split('.')[0],
-              type: file.split('.')[1],
-              size: Math.round(fileDetails.size/1024**2) + ' MB'
-            }
-            collection.push(metadata)
-          }
-        });
-        resolve()
-      });
-    })
-    
-    waiter.then(() => {
-      res.status(200).json({type: 'success', files: collection, message: 'Iterated files successfully'})
-    })
+    let files = await FileModel.find({})
+    res.status(200).json({type: 'success', files: files, message: 'Iterated files successfully'})
   }
   catch(e){
     res.send(500).json({type: 'failed', message: 'Failed to fetch files and folders.'})
@@ -83,8 +73,48 @@ app.post('/upload', upload.single('file'), (req, res) => {
   res.status(200).json({status: 'success', message: 'File uploaded successfully'});
 });
 
+// To register uploaded file in database
+app.post('/registerUpload', async(req, res) => {
+  let { uid, file, size, type, date, location, meta } = req.body
+  try{
+    let data = new FileModel({
+      uid: uid,
+      file: file,
+      size: size,
+      type: type,
+      date: date,
+      location: location,
+      meta: meta
+    })
+    const dataToSave = await data.save();
+    res.status(200).send({status: 'success', message: 'File metadata registered successfully'})
+  }
+  catch(e){
+      res.status(400).send({status: 'failed', message: 'Failed to register metadata'})
+  }
+})
+
+// To handle download request
 app.get('/download', (req, res) => {
-  res.send('Download route')
+    try{
+        res.download(__dirname+'/uploads/'+req.query.file)
+    }
+    catch(e){
+        res.status(400).send('File not found.')
+    }
+})
+
+
+// To handle file delete operation
+app.post('/delete', async(req, res) => {
+  try{
+    await fs.unlink(__dirname+'/uploads/'+req.body.file);
+    let result = await FileModel.findOneAndDelete({ uid: req.body.uid })
+    res.status(200).send({status: 'success', message: 'File deleted successfully'})
+  }
+  catch(e){
+    res.status(400).send('File not found to delete.')
+  }
 })
 
 
