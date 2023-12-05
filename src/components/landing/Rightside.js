@@ -52,7 +52,7 @@ export default function Rightside(){
                     Storage
                 </p>
                 <p className="custom-font is-size-7">{`${diskspace.free} GB of ${diskspace.size} GB Used`}</p>
-                <progress className="progress is-primary" value={(diskspace.size-diskspace.free)/diskspace.size*100} max="100">15%</progress>
+                <progress className="progress is-primary" value={(diskspace.size-diskspace.free)/diskspace.size*100} max="100"></progress>
             </div>
             <div>
                 <p className="custom-font has-text-weight-bold my-3">

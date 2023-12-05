@@ -7,13 +7,13 @@ let storage = process.env.REACT_APP_STORAGE
 export default function Center(){
     let { uploadProgress, uploadFile, trigger } = useUploadAgent()
     let [fileList, setFileList] = useState([])
+    let [toolTip, setToolTip] = useState(false)
 
     useEffect(() => {
         // To get list of files
         axios.get(`${storage}/readdisk`)
         .then((res) => {
             setFileList(res.data.files)
-            console.log(fileList);
         })
         .catch((e) => {
             console.log('Error: ' + e);
@@ -35,7 +35,19 @@ export default function Center(){
                     <a><span className="icon"><i className="fas fa-share-nodes" aria-hidden="true"></i></span></a>
                 </td>
                 <td>
-                    <a><span className="icon"><i className="fas fa-ellipsis" aria-hidden="true"></i></span></a>
+                    <a onClick={() => setToolTip(!toolTip)}><span className="icon"><i className="fas fa-ellipsis" aria-hidden="true"></i></span></a>
+                    <span className={`card is-flex is-flex-direction-column mt-2 ${toolTip ? 'is-visible':'is-hidden'}`}>
+                        <aside className="menu">
+                            <ul className="menu-list">
+                                <li>
+                                    <a><i className="custom-font is-size-7">Download</i></a>
+                                </li>
+                                <li>
+                                    <a><i className="custom-font is-size-7">Delete</i></a>
+                                </li>
+                            </ul>
+                        </aside>
+                    </span>
                 </td>
             </tr>
         )

@@ -19,7 +19,6 @@ let endpoint = process.env.REACT_APP_AUTHENTICATION
 export default function Login(){
 
     let navigate = useNavigate()
-    let { email, updateEmail } = useGlobalVariable()
     let [cred, setCred] = useState({
         email: null,
         password: null
@@ -30,6 +29,7 @@ export default function Login(){
     })
 
     useEffect(() => {
+        autoLogin()
         AOS.init();
     }, [])
 
@@ -71,6 +71,20 @@ export default function Login(){
                 })
             }, 2000)
         }
+    }
+
+    // To auto login
+    function autoLogin(){
+        axios.get(`${endpoint}/chat`, {withCredentials: true})
+        .then((res) => {
+            let status = res.data.verified
+            if(status){
+                navigate('/')
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+        })
     }
 
     return(

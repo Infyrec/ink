@@ -51,7 +51,7 @@ export default function Leftside(){
     }
 
     return(
-        <div className={`column is-one-quarter has-background-white is-flex is-flex-direction-column full-height borders ${visible ? 'is-visible':'is-hidden-touch'}`}>
+        <div className={`column has-background-white is-flex is-flex-direction-column full-height borders ${visible ? 'is-visible':'is-hidden-touch is-one-quarter'}`}>
             {/* Left side header */}
             <div>
                 <p className="custom-font subtitle has-text-weight-bold has-text-centered left-title">INFYREC</p>

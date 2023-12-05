@@ -1,10 +1,25 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom'
 import { useUploadAgent } from './UploadAgent';
 
+let endpoint = process.env.REACT_APP_AUTHENTICATION // Authentication server
+let connection = process.env.REACT_APP_CONNECTION // Socket server
+
 export default function Leftside(){
     let navigate = useNavigate()
-    let { uploadProgress, uploadFile } = useUploadAgent()
+    let { uploadProgress, uploadFile, emitMessage } = useUploadAgent()
+
+    // To logout user
+    function logoutUser(){
+        axios.get(`${endpoint}/logout`, {withCredentials: true})
+        .then((res) => {
+            navigate('/login')    
+        })
+        .catch((err) => {
+            console.log('Logout Error: ' + err);
+        });
+    }
 
     return(
         <div className="column is-one-fifth full-height custom-border is-flex is-flex-direction-column is-hidden-touch">
@@ -44,7 +59,7 @@ export default function Leftside(){
                             </label>
                         </li>
                         <li>
-                            <a className="custom-font">
+                            <a className="custom-font" onClick={() => navigate('/chat')}>
                                 <span className="icon">
                                     <i className="fas fa-message"></i>
                                 </span>
@@ -66,7 +81,7 @@ export default function Leftside(){
                             </a>
                         </li>
                         <li>
-                            <a className="custom-font" onClick={() => navigate('/login')}>
+                            <a className="custom-font" onClick={logoutUser}>
                                 <span className="icon">
                                     <i className="fas fa-right-from-bracket"></i>
                                 </span>

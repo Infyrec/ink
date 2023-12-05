@@ -37,7 +37,7 @@ export function CommonAgent({ children }){
         .then((res) => {
             let status = res.data.verified
             if(!status){
-                navigate('/')
+                navigate('/login')
             }
 
             if(!socket.current){
