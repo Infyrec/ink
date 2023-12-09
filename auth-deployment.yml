@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deployment
+  labels:
+    ink: authentication
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      ink: authentication
+  template:
+    metadata:
+      labels:
+        ink: authentication
+    spec:
+      containers:
+        - name: authentication-server
+          image: docker.io/library/ink_auth:v1
+          env:
+            - name: DATABASE_URL
+              value: "mongodb+srv://yourdburl/ink"
+            - name: REQUEST_ORIGIN
+              value: "http://inkcloud.app"
+            - name: SECRET_KEY
+              value: "IN23APFYRI23LREC"
+          ports:
+            - containerPort: 3001

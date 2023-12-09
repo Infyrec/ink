@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: store-deployment
+  labels:
+    ink: storage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      ink: storage
+  template:
+    metadata:
+      labels:
+        ink: storage
+    spec:
+      volumes:
+        - name: datastore
+          hostPath:
+            path: /home/master/Desktop/uploads
+      containers:
+        - name: storage-server
+          image: docker.io/library/ink_store:v1
+          volumeMounts:
+            - name: datastore
+              mountPath: /storage/uploads
+          env:
+            - name: DATABASE_URL
+              value: "mongodb+srv://yourdburl/ink"
+          ports:
+            - containerPort: 3002

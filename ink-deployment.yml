@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ink-deployment
+  labels:
+    ink: inkcloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      ink: inkcloud
+  template:
+    metadata:
+      labels:
+        ink: inkcloud
+    spec:
+      volumes:
+        - name: webpage
+          hostPath: 
+            path: /home/master/Desktop/frontend
+      containers:
+        - name: inkcloud-server
+          image: docker.io/library/ink_app:v1
+          volumeMounts:
+            - name: webpage
+              mountPath: /express/public
+          ports:
+            - containerPort: 3000

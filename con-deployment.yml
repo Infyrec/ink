@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: con-deployment
+  labels:
+    ink: connection
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      ink: connection
+  template:
+    metadata:
+      labels:
+        ink: connection
+    spec:
+      containers:
+        - name: connection-server
+          image: docker.io/library/ink_con:v1
+          env:
+            - name: DATABASE_URL
+              value: "mongodb+srv://yourdburl/ink"
+          ports:
+            - containerPort: 3003
