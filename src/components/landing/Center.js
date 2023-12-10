@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 
 import { useUploadAgent } from './UploadAgent';
 let storage = process.env.REACT_APP_STORAGE
 
 export default function Center(){
-    let { uploadProgress, uploadFile, trigger, setTrigger } = useUploadAgent()
+    let { uploadProgress, uploadFile, trigger, setTrigger, menu, setMenu } = useUploadAgent()
     let [fileList, setFileList] = useState([])
     let [toolTip, setToolTip] = useState(false)
 
@@ -66,7 +67,7 @@ export default function Center(){
     }
 
     return(
-        <div className="column full-height custom-border">
+        <div className={`column is-flex is-flex-direction-column full-height custom-border ${menu ? 'is-hidden' : 'is-visible'}`}>
             {/* Search bar */}
             <div className="is-flex is-justify-content-space-between my-3">
                 <div className="field">
@@ -92,6 +93,11 @@ export default function Center(){
                                 </span>
                             </label>
                         </button>
+                        <button className="button is-hidden-desktop" onClick={() => setMenu(!menu)}>
+                            <span className="icon">
+                                <i className="fa-solid fa-bars"></i>
+                            </span>
+                        </button>
                     </p>
                 </div>
             </div>
@@ -116,6 +122,24 @@ export default function Center(){
                         }
                     </tbody>
                 </table>
+            </div>
+            {/* Upload progress bar */}
+            <div class="modal">
+                <div class="modal-background"></div>
+                <div class="modal-content">
+                    <p className="custom-font has-text-weight-bold my-3">
+                        <span className="icon mr-1">
+                            <i className="fa-solid fa-upload"></i>
+                        </span>
+                        Progress
+                    </p>
+                    <div className="is-flex is-flex-direction-column is-align-items-center is-justify-content-center my-3">
+                        <div style={{ width: 120, height: 120 }}>
+                            <CircularProgressbar value={uploadProgress} text={`${uploadProgress}%`} styles={buildStyles({pathColor: '#00d1b2'})}/>
+                        </div>
+                    </div>
+                </div>
+                <button class="modal-close is-large" aria-label="close"></button>
             </div>
         </div>
     )

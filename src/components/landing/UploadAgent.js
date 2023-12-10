@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 let storage = process.env.REACT_APP_STORAGE
@@ -14,6 +14,25 @@ export function useUploadAgent(){
 export function UploadAgent({ children }){
     let [uploadProgress, setUploadProgress] = useState(0)
     let [trigger, setTrigger] = useState(0)
+    let [menu, setMenu] = useState(false)
+    let [diskspace, setDiskSpace] = useState({
+      free: 0,
+      size: 0
+    })
+
+    useEffect(() => {
+      // To get/fetch disk space
+      axios.get(`${storage}/diskspace`)
+      .then((res) => {
+          setDiskSpace({
+              free: Math.round(res.data.free),
+              size: Math.round(res.data.size)
+          })
+      })
+      .catch((e) => {
+          console.log('Error : ' + e);
+      })
+  }, [trigger])
 
     const uploadFile = async (e) => {
       try{
@@ -62,7 +81,12 @@ export function UploadAgent({ children }){
     }
 
     return(
-        <UploadContext.Provider value={{ uploadProgress, uploadFile, trigger, setTrigger }}>
+        <UploadContext.Provider value={{ 
+          uploadProgress, uploadFile, 
+          trigger, setTrigger, 
+          menu, setMenu, 
+          diskspace, setDiskSpace 
+          }}>
             {children}
         </UploadContext.Provider>
     )

@@ -8,25 +8,7 @@ import { useUploadAgent } from './UploadAgent';
 let storage = process.env.REACT_APP_STORAGE
 
 export default function Rightside(){
-    let { uploadProgress, uploadFile, trigger } = useUploadAgent()
-    let [diskspace, setDiskSpace] = useState({
-        free: 0,
-        size: 0
-    })
-
-    useEffect(() => {
-        // To get/fetch disk space
-        axios.get(`${storage}/diskspace`)
-        .then((res) => {
-            setDiskSpace({
-                free: Math.round(res.data.free),
-                size: Math.round(res.data.size)
-            })
-        })
-        .catch((e) => {
-            console.log('Error : ' + e);
-        })
-    }, [trigger])
+    let { uploadProgress, uploadFile, trigger, menu, setMenu, diskspace, setDiskSpace } = useUploadAgent()
 
     return(
         <div className="column is-one-fifth full-height custom-border is-flex is-flex-direction-column px-5 is-hidden-touch">
