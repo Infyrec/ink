@@ -15,6 +15,8 @@ export function UploadAgent({ children }){
     let [uploadProgress, setUploadProgress] = useState(0)
     let [trigger, setTrigger] = useState(0)
     let [menu, setMenu] = useState(false)
+    let [modal, setModal] = useState(false)
+    let [details, setDetails] = useState(null)
     let [diskspace, setDiskSpace] = useState({
       free: 0,
       size: 0
@@ -53,6 +55,8 @@ export function UploadAgent({ children }){
         formData.append('file', e.target.files[0]);
     
         try {
+          setMenu(false)
+          setModal(true)
           const response = await axios.post(`${storage}/upload`, formData, {
             onUploadProgress: (progressEvent) => {
               const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -85,7 +89,9 @@ export function UploadAgent({ children }){
           uploadProgress, uploadFile, 
           trigger, setTrigger, 
           menu, setMenu, 
-          diskspace, setDiskSpace 
+          diskspace, setDiskSpace,
+          modal, setModal,
+          details, setDetails 
           }}>
             {children}
         </UploadContext.Provider>

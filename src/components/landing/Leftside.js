@@ -26,7 +26,7 @@ export default function Leftside(){
         <div className={`column is-one-fifth full-height custom-border is-flex is-flex-direction-column ${menu ? 'is-visible' : 'is-hidden-touch'}`}>
             <div className="is-flex is-justify-content-center my-4">
                 <figure className="image is-128x128">
-                    <img className="is-rounded" src={require('../assets/Ragul.jpg')}/>
+                    <img className="is-rounded" src={require('../assets/man.png')}/>
                 </figure>
             </div>
             <div className="is-flex-grow-1 my-4">

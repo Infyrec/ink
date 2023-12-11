@@ -41,3 +41,9 @@ html, body{
 .card-four{
     background-image: linear-gradient(to left top, #000000, #340f20, #5f0d41, #8a026d, #b000a4, #ad13ba, #a624d1, #9834e9, #6f3cd4, #493ebb, #263aa0, #003483);
 }
+
+.add-folder-btn{
+    position: absolute;
+    bottom: 5%;
+    right: 5%
+}

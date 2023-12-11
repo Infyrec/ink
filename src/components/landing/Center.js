@@ -6,7 +6,13 @@ import { useUploadAgent } from './UploadAgent';
 let storage = process.env.REACT_APP_STORAGE
 
 export default function Center(){
-    let { uploadProgress, uploadFile, trigger, setTrigger, menu, setMenu } = useUploadAgent()
+    let { 
+        uploadProgress, uploadFile, 
+        trigger, setTrigger, 
+        menu, setMenu, 
+        modal, setModal,
+        details, setDetails
+    } = useUploadAgent()
     let [fileList, setFileList] = useState([])
     let [toolTip, setToolTip] = useState(false)
 
@@ -15,6 +21,7 @@ export default function Center(){
         axios.get(`${storage}/readfiles`)
         .then((res) => {
             setFileList(res.data.files)
+            setModal(false)
         })
         .catch((e) => {
             console.log('Error: ' + e);
@@ -22,6 +29,7 @@ export default function Center(){
     }, [trigger])
 
     function downloadRequest(prop){
+        console.log('download');
         setToolTip(!toolTip)
         window.open(`${storage}/download/?file=${prop.file}`)
     }
@@ -42,25 +50,21 @@ export default function Center(){
         let { uid, file, type, size } = props
         return(
             <tr>
-                <td>
+                <td onMouseOver={() => setDetails(props)}>
                     <p className="custom-font is-size-6 has-text-centered">{file}</p>
-                </td>
-                <td>
-                    <p className="custom-font is-size-6 has-text-centered">{type.split('/')[1]}</p>
                 </td>
                 <td>
                     <p className="custom-font is-size-6 has-text-centered">{size}</p>
                 </td>
-                <td>
-                    <p className="has-text-centered">
-                        <a className="mx-2"><span className="icon"><i className="fas fa-share-nodes" aria-hidden="true"></i></span></a>
-                        <a onClick={() => downloadRequest(props)} className="mx-2">
-                            <span className="icon"><i className="fas fa-download" aria-hidden="true"></i></span>
-                        </a>
-                        <a onClick={() => deleteRequest(props)} className="mx-2">
-                            <span className="icon"><i className="fas fa-trash" aria-hidden="true"></i></span>
-                        </a>
-                    </p>
+                <td className="has-text-centered">
+                    <a onClick={() => downloadRequest(props)}>
+                        <span className="icon"><i className="fas fa-download" aria-hidden="true"></i></span>
+                    </a>
+                </td>
+                <td className="has-text-centered">
+                    <a onClick={() => deleteRequest(props)}>
+                        <span className="icon"><i className="fas fa-trash" aria-hidden="true"></i></span>
+                    </a>
                 </td>
             </tr>
         )
@@ -102,45 +106,58 @@ export default function Center(){
                 </div>
             </div>
             {/* All files */}
-            <div className="my-3">
+            <div className="my-3 ">
                 <p className="custom-font is-size-5 has-text-weight-bold my-3">Files</p>
                 {/* List view */}
-                <table className="table is-striped is-fullwidth">
-                    <thead>
-                        <tr>
-                            <th className="has-text-centered">Name</th>
-                            <th className="has-text-centered">Type</th>
-                            <th className="has-text-centered">Size</th>
-                            <th className="has-text-centered">Options</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            fileList.map((data) => (
-                                <FileDataList uid={data.uid} file={data.file} type={data.type} size={data.size} />
-                            ))
-                        }
-                    </tbody>
-                </table>
+                <div className="table-container">
+                    <table className="table is-hoverable is-striped is-fullwidth">
+                        <thead>
+                            <tr>
+                                <th className="has-text-centered">Name</th>
+                                <th className="has-text-centered">Size</th>
+                                <th className="has-text-centered">Download</th>
+                                <th className="has-text-centered">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                fileList.map((data) => (
+                                    <FileDataList uid={data.uid} file={data.file} type={data.type} size={data.size} />
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
             {/* Upload progress bar */}
-            <div class="modal">
-                <div class="modal-background"></div>
-                <div class="modal-content">
-                    <p className="custom-font has-text-weight-bold my-3">
-                        <span className="icon mr-1">
-                            <i className="fa-solid fa-upload"></i>
-                        </span>
-                        Progress
-                    </p>
-                    <div className="is-flex is-flex-direction-column is-align-items-center is-justify-content-center my-3">
-                        <div style={{ width: 120, height: 120 }}>
-                            <CircularProgressbar value={uploadProgress} text={`${uploadProgress}%`} styles={buildStyles({pathColor: '#00d1b2'})}/>
+            <div class={`modal is-hidden-tablet ${modal ? 'is-active' : 'is-hidden'}`}>
+            <div class="modal-background"></div>
+                <div class="modal-card">
+                    <header class="modal-card-head">
+                        <p className="custom-font has-text-weight-bold my-3">
+                            <span className="icon mr-1">
+                                <i className="fa-solid fa-upload"></i>
+                            </span>
+                            Progress
+                        </p>
+                    </header>
+                    <section class="modal-card-body">
+                        <div className="is-flex is-flex-direction-column is-align-items-center is-justify-content-center my-3">
+                            <div style={{ width: 120, height: 120 }}>
+                                <CircularProgressbar value={uploadProgress} text={`${uploadProgress}%`} styles={buildStyles({pathColor: '#00d1b2'})}/>
+                            </div>
                         </div>
-                    </div>
+                    </section>
+                    <footer class="modal-card-foot">
+                    <button class="button is-danger">Cancel</button>
+                    </footer>
                 </div>
-                <button class="modal-close is-large" aria-label="close"></button>
             </div>
+            <button className="button is-hidden-desktop add-folder-btn">
+                <span className="icon">
+                    <i className="fa-solid fa-folder-plus"></i>
+                </span>
+            </button>
         </div>
     )
 }

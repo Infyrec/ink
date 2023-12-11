@@ -8,7 +8,13 @@ import { useUploadAgent } from './UploadAgent';
 let storage = process.env.REACT_APP_STORAGE
 
 export default function Rightside(){
-    let { uploadProgress, uploadFile, trigger, menu, setMenu, diskspace, setDiskSpace } = useUploadAgent()
+    let { 
+        uploadProgress, uploadFile, 
+        trigger, setTrigger,
+        menu, setMenu, 
+        diskspace, setDiskSpace,
+        details, setDetails
+    } = useUploadAgent()
 
     return(
         <div className="column is-one-fifth full-height custom-border is-flex is-flex-direction-column px-5 is-hidden-touch">
@@ -38,32 +44,18 @@ export default function Rightside(){
             <div>
                 <p className="custom-font has-text-weight-bold my-3">
                     <span className="icon mr-1">
-                        <i className="fa-solid fa-filter"></i>
+                        <i className="fa-solid fa-circle-info"></i>
                     </span>
-                    Filter
+                    Details
                 </p>
-                <p className="buttons is-flex is-justify-content-space-around">
-                    <button className="button">
-                        <span className="icon">
-                            <i className="fa-solid fa-image"></i>
-                        </span>
-                    </button>
-                    <button className="button">
-                        <span className="icon">
-                            <i className="fa-solid fa-file"></i>
-                        </span>
-                    </button>
-                    <button className="button">
-                    <span className="icon">
-                        <i className="fa-solid fa-video"></i>
-                    </span>
-                    </button>
-                    <button className="button">
-                        <span className="icon">
-                            <i className="fa-solid fa-headphones"></i>
-                        </span>
-                    </button>
-                </p>
+                {
+                    details != null ?
+                    <>
+                    <p className="is-size-6 custom-font">Name: {details.file}</p>
+                    <p className="is-size-6 custom-font">Type: {details.type}</p>
+                    <p className="is-size-6 custom-font">Size: {details.size}</p>
+                    </>:null
+                }
             </div>
         </div>
     )
