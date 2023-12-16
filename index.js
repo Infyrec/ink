@@ -87,6 +87,14 @@ app.post('/registerUpload', async(req, res) => {
       meta: meta
     })
     const dataToSave = await data.save();
+
+    let original = __dirname+'/uploads/'+file
+    let renamed = __dirname+'/uploads/'+uid+'.'+file.split('.')[1]
+
+    fs.rename(original, renamed, () => { 
+      console.log("File Renamed!"); 
+    });
+
     res.status(200).send({status: 'success', message: 'File metadata registered successfully'})
   }
   catch(e){
@@ -97,18 +105,20 @@ app.post('/registerUpload', async(req, res) => {
 // To handle download request
 app.get('/download', (req, res) => {
     try{
-        res.download(__dirname+'/uploads/'+req.query.file)
+        //res.download(__dirname+'/uploads/'+req.query.file)
+        res.sendFile(__dirname+'/uploads/'+req.query.file)
     }
     catch(e){
         res.status(400).send('File not found.')
     }
 })
 
-
 // To handle file delete operation
 app.post('/delete', async(req, res) => {
   try{
-    await fs.unlink(__dirname+'/uploads/'+req.body.file);
+    let file = req.body.uid + '.' + req.body.file.split('.')[1]
+
+    await fs.unlink(__dirname+'/uploads/'+file);
     let result = await FileModel.findOneAndDelete({ uid: req.body.uid })
     res.status(200).send({status: 'success', message: 'File deleted successfully'})
   }
