@@ -68,6 +68,9 @@ app.post('/signup', (req, res) => {
     });
 })
 
+/*---------------------- Login Routes ----------------------*/
+
+/* Web login */
 app.post('/login', async(req, res) => {
     let { email, password } = req.body
 
@@ -88,6 +91,39 @@ app.post('/login', async(req, res) => {
                     })
                 
                     res.status(200).send({verified: data.verified, status: 'success', userdata: data})
+                }
+    
+                if(!response){
+                    res.status(403).send({verified: false, status: 'invalid'})
+                }
+            });
+        }
+        else{
+            res.status(404).send({verified: false, status: 'failed'})
+        }
+    }
+    catch(e){
+        res.status(500).send({verified: 'unknown', status: 'failed'})
+    }
+})
+
+/* App login */
+app.post('/app/login', async(req, res) => {
+    let { email, password } = req.body
+    console.log(email, password);
+    try{
+        let result = await SignupModel.findOne({ email: email }).exec();
+
+        if(result){
+            bcrypt.compare(password, result.password, function(err, response) {
+                if(response){
+                    let data = {
+                        username: result.username,
+                        email: result.email
+                    }
+                    let accessToken = sign({email: email}, process.env.SECRET_KEY, {expiresIn: 3600000})
+                
+                    res.status(200).send({verified: data.verified, status: 'success', token: accessToken})
                 }
     
                 if(!response){
