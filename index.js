@@ -47,6 +47,9 @@ app.post('/uname', async(req, res) => {
     }
 })
 
+
+/*---------------------- Signup Route ----------------------*/
+/* Web & App signup */
 app.post('/signup', (req, res) => {
     let { username, email, password } = req.body
 
@@ -68,8 +71,8 @@ app.post('/signup', (req, res) => {
     });
 })
 
-/*---------------------- Login Routes ----------------------*/
 
+/*---------------------- Login Routes ----------------------*/
 /* Web login */
 app.post('/login', async(req, res) => {
     let { email, password } = req.body
@@ -117,13 +120,15 @@ app.post('/app/login', async(req, res) => {
         if(result){
             bcrypt.compare(password, result.password, function(err, response) {
                 if(response){
+                    let accessToken = sign({email: email}, process.env.SECRET_KEY, {expiresIn: 3600000})
+
                     let data = {
                         username: result.username,
-                        email: result.email
+                        email: result.email,
+                        token: accessToken
                     }
-                    let accessToken = sign({email: email}, process.env.SECRET_KEY, {expiresIn: 3600000})
                 
-                    res.status(200).send({verified: data.verified, status: 'success', token: accessToken})
+                    res.status(200).send({verified: data.verified, status: 'success', token: data})
                 }
     
                 if(!response){
@@ -140,11 +145,9 @@ app.post('/app/login', async(req, res) => {
     }
 })
 
-app.get('/logout', (req, res) => {
-    res.clearCookie('access-token')
-    res.status(200).send({verified: true, status: 'success'})
-})
 
+/*---------------------- Cookie Verify Routes Routes ----------------------*/
+/* web verification */
 app.get('/chat', (req, res) => {
 
     let token = req.cookies['access-token']
@@ -162,5 +165,31 @@ app.get('/chat', (req, res) => {
         res.status(401).send('Cookie not found. Please login again !')
     }
 })
+
+/* App verification */
+app.post('/app/verfiy', (req, res) => {
+
+    let token = req.body.token
+
+    if(token){
+        try{
+            let result = verify(token, process.env.SECRET_KEY)
+            res.status(200).send({verified: true, status: 'success'})
+        }
+        catch(e){
+            res.status(400).send('Cookie is not valid.')
+        }
+    }
+    else{
+        res.status(401).send('Cookie not found. Please login again !')
+    }
+})
+
+/*---------------------- Logout route ----------------------*/
+app.get('/logout', (req, res) => {
+    res.clearCookie('access-token')
+    res.status(200).send({verified: true, status: 'success'})
+})
+
 
 app.listen(3001, () => console.log('Authentication server running at port 3001 !'))
