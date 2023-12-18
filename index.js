@@ -113,7 +113,6 @@ app.post('/login', async(req, res) => {
 /* App login */
 app.post('/app/login', async(req, res) => {
     let { email, password } = req.body
-    console.log(email, password);
     try{
         let result = await SignupModel.findOne({ email: email }).exec();
 
