@@ -16,7 +16,6 @@ const DataModel = require('./schema/dataModel');
 
 app.use(cors())
 
-//const dbConnect = process.env.DATABASE_URL
 const dbConnect = process.env.DATABASE_URL
 mongoose.connect(dbConnect);
 const database = mongoose.connection
