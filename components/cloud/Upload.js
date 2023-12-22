@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { Icon } from '@rneui/themed';
+import { useDispatch } from 'react-redux';
+import { callNewfile } from '../redux/slize';
 import * as DocumentPicker from 'expo-document-picker';
 import axios from 'axios';
-import { useCommonAgent } from './CommonAgent';
-import { endpoints } from '../endpoints'
+import { endpoints } from '../../endpoints';
 
 let storage = endpoints.storage
 
 export default function Upload(){
 
-    let { readFiles, readSize } = useCommonAgent()
+    let dispatch = useDispatch()
     let [uploadPercentage, setUploadPercentage] = useState(0)
 
     let handleUpload = async() => {
@@ -53,8 +54,7 @@ export default function Upload(){
                 if(response.data.status == 'success'){
                     axios.post(`${storage}/registerUpload`, metadata)
                     .then((res) => {
-                        readFiles()
-                        readSize()
+                        dispatch(callNewfile())
                         setUploadPercentage(0)
                         Alert.alert('Success', 'File uploaded successfully.', [
                             {

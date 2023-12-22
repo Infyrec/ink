@@ -2,8 +2,9 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Alert } from
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { Icon, Avatar, ListItem } from '@rneui/themed';
 import React, { useState, useEffect } from 'react';
-import { useCommonAgent } from './CommonAgent';
-import { endpoints } from '../endpoints'
+import { callAuthorize } from '../redux/slize';
+import { useSelector, useDispatch } from 'react-redux'
+import { endpoints } from '../../endpoints'
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system'
 import Realm from "realm";
@@ -12,10 +13,51 @@ let storage = endpoints.storage
 
 export default function Home(){
 
-    let { percentage, diskspace, fileList, readFiles, setAuthorization } = useCommonAgent()
-    let [menu, openMenu] = useState(false)
+    let dispatch = useDispatch()
+    let newFile = useSelector((state) => state.slize.newfile)
+
+    let [diskspace, setDiskSpace] = useState({
+        free: 0,
+        size: 0
+    })
+    let [fileList, setFileList] = useState([])
     let [selected, setSelected] = useState(null)
     let [downloadProgress, setDownloadProgress] = useState(0)
+    let [percentage, setPercentage] = useState(0)
+    let [menu, openMenu] = useState(false)
+
+    useEffect(() => {
+        /* To get/fetch disk space */
+        readSize()
+        /* To read files */
+        readFiles()
+    }, [newFile])
+
+    /* To read the size of the disk */
+    function readSize(){
+        axios.get(`${storage}/diskspace`)
+        .then((res) => {
+            setDiskSpace({
+                free: Math.round(res.data.free),
+                size: Math.round(res.data.size)
+            })
+            setPercentage((Math.round(res.data.size)-Math.round(res.data.free))/Math.round(res.data.size)*100)
+        })
+        .catch((e) => {
+            console.log('Error : ' + e);
+        })
+    }
+
+    /* To read the list of files */
+    function readFiles(){
+        axios.get(`${storage}/readfiles`)
+        .then((res) => {
+            setFileList(res.data.files)
+        })
+        .catch((e) => {
+            console.log('Error: ' + e);
+        })
+    }
 
     const startDownload = async () => {
         const fileURI = FileSystem.documentDirectory+selected.file;
@@ -91,7 +133,7 @@ export default function Home(){
             tokeSchema.write(() => {
                 const token = tokeSchema.objects('Token')
                 tokeSchema.delete(token)
-                setAuthorization(false)
+                dispatch(callAuthorize(false))
             })
         }
         catch(e){
@@ -136,7 +178,7 @@ export default function Home(){
                             <TouchableOpacity>
                                 <ListItem bottomDivider containerStyle={{ backgroundColor: '#26282d' }}>
                                     <Avatar
-                                        source={require('../assets/docs.png')}
+                                        source={require('../../assets/docs.png')}
                                         size={50}
                                     />
                                     <ListItem.Content>

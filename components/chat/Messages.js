@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Dimensions } from 'react-native';
 import { Avatar, Icon } from '@rneui/themed';
 import Realm from "realm";
-import { useCommonAgent } from './CommonAgent';
+import { useSocket } from './Socket';
 
-import { Sender, Stranger } from './templates';
+import { Sender, Stranger } from './Templates';
 
 const dimensions = Dimensions.get('screen');
 
 export default function Messages({ route, navigation }){
-  let { emitMessage, messages, setMessage } = useCommonAgent()
+  let { emitMessage, messages, setMessage } = useSocket()
   let [userData, setUserData] = useState(null)
   let [written, setWritten] = useState(null)
   let [stranger, setStranger] = useState(null)

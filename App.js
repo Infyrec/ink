@@ -1,8 +1,9 @@
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from 'expo-font';
-import { CommonAgent } from "./components/CommonAgent";
+import store from "./components/redux/store";
+import { Provider } from "react-redux";
 
-import Router from "./components/Router";
+import Router from "./components/router/Router";
 
 export default function App() {
 
@@ -14,10 +15,10 @@ export default function App() {
 
   if(fontsLoaded){
     return (
-      <CommonAgent>
+      <Provider store={store}>
         <Router />
         <StatusBar style="light"/>
-      </CommonAgent>
+      </Provider>
     );
   }
 }

@@ -6,8 +6,9 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import { z } from "zod";
-import { endpoints } from '../endpoints';
-import { useCommonAgent } from './CommonAgent';
+import { endpoints } from '../../endpoints';
+import { callAuthorize } from '../redux/slize';
+import { useDispatch } from 'react-redux';
 import Realm from "realm";
 
 const credSchema = z.object({
@@ -18,7 +19,7 @@ const credSchema = z.object({
 let endpoint = endpoints.authentication
 
 export default function Login({ navigation }){
-    let { authorized, setAuthorization } = useCommonAgent()
+    let dispatch = useDispatch()
     let [cred, setCred] = useState({
         email: null,
         password: null
@@ -47,10 +48,10 @@ export default function Login({ navigation }){
             await tokeSchema.write(() => {
                 tokeSchema.create('Token', props);
             });
-            setAuthorization(true)
-            setLoader(false)
+            dispatch(callAuthorize(true))
         } 
         catch(err) {
+            setLoader(false)
             console.error('Error adding token to Realm:', err);
         }
     }
@@ -77,8 +78,7 @@ export default function Login({ navigation }){
             .then((res) => {
                 let status = res.data.status
                 if(status == 'success'){
-                    setAuthorization(true)
-                    setLoader(false)
+                    dispatch(callAuthorize(true))
                 }
             })
             .catch((err) => {
@@ -158,7 +158,7 @@ export default function Login({ navigation }){
         </Card>
         <Modal visible={loader}>
             <View style={_login.loader}>
-                <Image source={require('../assets/lottie/loader.gif')}
+                <Image source={require('../../assets/lottie/loader.gif')}
                     style={{
                         width: 300,
                         height: 300

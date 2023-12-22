@@ -2,62 +2,21 @@ import React, { useState, useEffect, useContext, createContext, useRef } from 'r
 import axios from 'axios';
 import Realm from "realm";
 import { io } from "socket.io-client";
-import { endpoints } from '../endpoints'
+import { endpoints } from '../../endpoints'
 
 let storage = endpoints.storage
 let connection = endpoints.connection
 
 let AgentContext = createContext()
 
-export function useCommonAgent(){
+export function useSocket(){
     return useContext(AgentContext)
 }
 
-export function CommonAgent({ children }){
-
-    let socket = useRef()
-    let [authorized, setAuthorization] = useState(false)
-    let [percentage, setPercentage] = useState(0)
-    let [diskspace, setDiskSpace] = useState({
-        free: 0,
-        size: 0
-    })
-    let [fileList, setFileList] = useState([])
+export function SocketHook({ children }){
+    let socket = useRef()    
     let [activeUsers, setActiveUsers] = useState([])
     let [messages, setMessage] = useState([])
-
-    useEffect(() => {
-        /* To get/fetch disk space */
-        readSize()
-        /* To read files */
-        readFiles()
-    }, [])
-
-    /* To read the size of the disk */
-    function readSize(){
-        axios.get(`${storage}/diskspace`)
-        .then((res) => {
-            setDiskSpace({
-                free: Math.round(res.data.free),
-                size: Math.round(res.data.size)
-            })
-            setPercentage((Math.round(res.data.size)-Math.round(res.data.free))/Math.round(res.data.size)*100)
-        })
-        .catch((e) => {
-            console.log('Error : ' + e);
-        })
-    }
-
-    /* To read the list of files */
-    function readFiles(){
-        axios.get(`${storage}/readfiles`)
-        .then((res) => {
-            setFileList(res.data.files)
-        })
-        .catch((e) => {
-            console.log('Error: ' + e);
-        })
-    }
 
     /* To handle incoming and outgoing message */
     function socketConnection(){
@@ -209,11 +168,6 @@ export function CommonAgent({ children }){
 
     return(
         <AgentContext.Provider value={{
-            authorized, setAuthorization,
-            percentage, setPercentage,
-            diskspace, setDiskSpace,
-            fileList, setFileList,
-            readFiles, readSize,
             messages, setMessage,
             socketConnection, emitMessage,
             onlineActiveUsers, activeUsers

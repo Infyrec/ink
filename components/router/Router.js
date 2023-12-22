@@ -2,13 +2,14 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Icon, Text } from '@rneui/themed';
-import { useCommonAgent } from './CommonAgent';
+import { callAuthorize } from '../redux/slize';
+import { useSelector } from 'react-redux';
 
-import Login from './Login';
-import Signup from './Signup';
-import Home from './Home';
-import Upload from './Upload';
-import Chat from './Chat';
+import Login from '../authentication/Login';
+import Signup from '../authentication/Signup';
+import Home from '../cloud/Home';
+import Upload from '../cloud/Upload';
+import Chat from '../chat/Chat';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -55,7 +56,7 @@ function MainScreen(){
 
 export default function Router() {
 
-    let { authorized, setAuthorization } = useCommonAgent()
+    let authorized = useSelector((state) => state.slize.authorized)
 
     return (
         <NavigationContainer>

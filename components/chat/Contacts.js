@@ -1,16 +1,16 @@
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { ListItem, Avatar } from '@rneui/themed';
 import { useState, useEffect } from 'react';
-import { useCommonAgent } from './CommonAgent';
+import { useSocket } from './Socket';
 import Realm from "realm";
 import axios from 'axios';
-import { endpoints } from '../endpoints';
+import { endpoints } from '../../endpoints';
 
 let connection = endpoints.connection
 
 export default function Contacts({ navigation }){
 
-    let { socketConnection, activeUsers } = useCommonAgent()
+    let { socketConnection, activeUsers } = useSocket()
 
     useEffect(() => {
         socketConnection()

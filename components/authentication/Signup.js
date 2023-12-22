@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { z } from 'zod';
 import axios from 'axios';
-import { endpoints } from '../endpoints';
+import { endpoints } from '../../endpoints';
 
 let endpoint = endpoints.authentication
 
@@ -123,7 +123,7 @@ export default function Signup({ navigation }){
         </Card>
         <Modal visible={loader}>
             <View style={_signup.loader}>
-                <Image source={require('../assets/lottie/loader.gif')}
+                <Image source={require('../../assets/lottie/loader.gif')}
                     style={{
                         width: 300,
                         height: 300
