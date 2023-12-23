@@ -61,6 +61,34 @@ io.on("connection", (socket) => {
     }
   })
 
+  // To make a call
+  socket.on('make-call', async(data) => {
+    try{
+        let result = await DataModel.findOne({ email: data.email }).exec();
+        
+        if(result){
+            io.to(result.sockid).emit('receiving-call', data)
+        }
+    }
+    catch(e){
+        console.log(e);
+    }
+  })
+
+  // To accept a call
+  socket.on('accept-call', async(data) => {
+    try{
+        let result = await DataModel.findOne({ email: data.email }).exec();
+        
+        if(result){
+            io.to(result.sockid).emit('call-accepted', data)
+        }
+    }
+    catch(e){
+        console.log(e);
+    }
+  })
+
   // To send media buffers
   socket.on('send-buffer', async(data) => {
     try{
