@@ -84,55 +84,57 @@ export default function Signup({ navigation }){
         }
     }
 
-  return (
-    <LinearGradient colors={['#26282D', '#26282D']} style={_signup.container}>
-        <Card containerStyle={_signup.card}>
-            <Card.Title style={_signup.cardTitle}>Welcome to Ink</Card.Title>
-            <View style={{ marginVertical: 8 }}>
-                <Input
-                    placeholder="Username"
-                    leftIcon={<Icon name="account-box" size={24} />}
-                    onChangeText={(text) => setCred(prev => ({...prev, username: text}))}
-                    value={cred.username}
-                    style={{ fontFamily: 'poppins', color: indicate ? '#00d1b2' : '#ff3860'}}
-                />
-                <Input
-                    placeholder="Email"
-                    leftIcon={<Icon name="email" size={24} />}
-                    onChangeText={(text) => setCred(prev => ({...prev, email: text}))}
-                    value={cred.email}
-                    style={{ fontFamily: 'poppins' }}
-                />
-                <Input
-                    placeholder="Password"
-                    secureTextEntry
-                    leftIcon={<Icon name="lock" size={24} />}
-                    onChangeText={(text) => setCred(prev => ({...prev, password: text}))}
-                    value={cred.password}
-                    style={{ fontFamily: 'poppins' }}
-                />
-            </View>
-            <View style={{ alignItems: 'center' }}>
-                <TouchableOpacity style={_signup.btn} onPress={processSignup}>
-                    <Text style={{ color: 'white', fontSize: 18, fontFamily: 'poppins-semibold' }}>Signup</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={{ marginTop: 30 }} onPress={() => navigation.navigate('Login')}>
-                    <Text style={{ textDecorationLine: 'underline', fontFamily: 'poppins' }}>Already having an account? Login</Text>
-                </TouchableOpacity>
-            </View>
-        </Card>
-        <Modal visible={loader}>
-            <View style={_signup.loader}>
-                <Image source={require('../../assets/lottie/loader.gif')}
-                    style={{
-                        width: 300,
-                        height: 300
-                    }}
-                />
-            </View>
-        </Modal>
-    </LinearGradient>
-  );
+    if(!loader){
+        return (
+            <LinearGradient colors={['#26282D', '#26282D']} style={_signup.container}>
+                <Card containerStyle={_signup.card}>
+                    <Card.Title style={_signup.cardTitle}>Welcome to Ink</Card.Title>
+                    <View style={{ marginVertical: 8 }}>
+                        <Input
+                            placeholder="Username"
+                            leftIcon={<Icon name="account-box" size={24} />}
+                            onChangeText={(text) => setCred(prev => ({...prev, username: text}))}
+                            value={cred.username}
+                            style={{ fontFamily: 'poppins', color: indicate ? '#00d1b2' : '#ff3860'}}
+                        />
+                        <Input
+                            placeholder="Email"
+                            leftIcon={<Icon name="email" size={24} />}
+                            onChangeText={(text) => setCred(prev => ({...prev, email: text}))}
+                            value={cred.email}
+                            style={{ fontFamily: 'poppins' }}
+                        />
+                        <Input
+                            placeholder="Password"
+                            secureTextEntry
+                            leftIcon={<Icon name="lock" size={24} />}
+                            onChangeText={(text) => setCred(prev => ({...prev, password: text}))}
+                            value={cred.password}
+                            style={{ fontFamily: 'poppins' }}
+                        />
+                    </View>
+                    <View style={{ alignItems: 'center' }}>
+                        <TouchableOpacity style={_signup.btn} onPress={processSignup}>
+                            <Text style={{ color: 'white', fontSize: 18, fontFamily: 'poppins-semibold' }}>Signup</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{ marginTop: 30 }} onPress={() => navigation.navigate('Login')}>
+                            <Text style={{ textDecorationLine: 'underline', fontFamily: 'poppins' }}>Already having an account? Login</Text>
+                        </TouchableOpacity>
+                    </View>
+                </Card>
+            </LinearGradient>
+        )
+    }
+    else{
+        <View style={_signup.loader}>
+            <Image source={require('../../assets/lottie/loader.gif')}
+                style={{
+                    width: 300,
+                    height: 300
+                }}
+            />
+        </View>
+    }
 };
 
 const _signup = StyleSheet.create({

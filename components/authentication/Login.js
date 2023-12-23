@@ -102,7 +102,6 @@ export default function Login({ navigation }){
             axios.post(`${endpoint}/app/login`, cred, {withCredentials: true})
               .then((res) => {
                     if(res.data.status == 'success'){
-                        console.log(res.data.token);
                         storeCookie(res.data.token)
                     }    
               })
@@ -128,38 +127,43 @@ export default function Login({ navigation }){
             ]);
         }
     }
-
-  return (
-    <LinearGradient colors={['#26282D', '#26282D']} style={_login.container}>
-        <Card containerStyle={_login.card}>
-            <Card.Title style={_login.cardTitle}>Welcome to Ink</Card.Title>
-            <View style={{ marginVertical: 8 }}>
-                <Input
-                    placeholder="Email"
-                    leftIcon={<Icon name="email" size={24} />}
-                    onChangeText={(text) => setCred(prev => ({...prev, email: text}))}
-                    value={cred.email}
-                    style={{ fontFamily: 'poppins' }}
-                />
-                <Input
-                    placeholder="Password"
-                    secureTextEntry
-                    leftIcon={<Icon name="lock" size={24} />}
-                    onChangeText={(text) => setCred(prev => ({...prev, password: text}))}
-                    value={cred.password}
-                    style={{ fontFamily: 'poppins' }}
-                />
-            </View>
-            <View style={{ alignItems: 'center' }}>
-                <TouchableOpacity style={_login.btn} onPress={processLogin }>
-                    <Text style={{ color: 'white', fontSize: 18, fontFamily: 'poppins-semibold' }}>Login</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={{ marginTop: 30 }} onPress={() => navigation.navigate('Signup')}>
-                    <Text style={{ textDecorationLine: 'underline', fontFamily: 'poppins' }}>New to Ink? Create Account</Text>
-                </TouchableOpacity>
-            </View>
-        </Card>
-        <Modal visible={loader}>
+    
+    if(!loader){
+        return (
+            <LinearGradient colors={['#26282D', '#26282D']} style={_login.container}>
+                <Card containerStyle={_login.card}>
+                    <Card.Title style={_login.cardTitle}>Welcome to Ink</Card.Title>
+                    <View style={{ marginVertical: 8 }}>
+                        <Input
+                            placeholder="Email"
+                            leftIcon={<Icon name="email" size={24} />}
+                            onChangeText={(text) => setCred(prev => ({...prev, email: text}))}
+                            value={cred.email}
+                            style={{ fontFamily: 'poppins' }}
+                        />
+                        <Input
+                            placeholder="Password"
+                            secureTextEntry
+                            leftIcon={<Icon name="lock" size={24} />}
+                            onChangeText={(text) => setCred(prev => ({...prev, password: text}))}
+                            value={cred.password}
+                            style={{ fontFamily: 'poppins' }}
+                        />
+                    </View>
+                    <View style={{ alignItems: 'center' }}>
+                        <TouchableOpacity style={_login.btn} onPress={processLogin }>
+                            <Text style={{ color: 'white', fontSize: 18, fontFamily: 'poppins-semibold' }}>Login</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{ marginTop: 30 }} onPress={() => navigation.navigate('Signup')}>
+                            <Text style={{ textDecorationLine: 'underline', fontFamily: 'poppins' }}>New to Ink? Create Account</Text>
+                        </TouchableOpacity>
+                    </View>
+                </Card>
+            </LinearGradient>
+          )
+    }
+    else {
+        return(
             <View style={_login.loader}>
                 <Image source={require('../../assets/lottie/loader.gif')}
                     style={{
@@ -168,9 +172,8 @@ export default function Login({ navigation }){
                     }}
                 />
             </View>
-        </Modal>
-    </LinearGradient>
-  );
+        )
+    }
 };
 
 const _login = StyleSheet.create({
