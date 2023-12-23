@@ -3,6 +3,8 @@ import axios from 'axios';
 import Realm from "realm";
 import { io } from "socket.io-client";
 import { endpoints } from '../../endpoints'
+import { useDispatch } from 'react-redux';
+import { callVoip } from '../redux/slize';
 
 let storage = endpoints.storage
 let connection = endpoints.connection
@@ -15,8 +17,11 @@ export function useSocket(){
 
 export function SocketHook({ children }){
     let socket = useRef()    
+    let dispatch = useDispatch()
     let [activeUsers, setActiveUsers] = useState([])
     let [messages, setMessage] = useState([])
+    let [offer, setOffer] = useState(undefined)
+    let [answer, setAnswer] = useState(undefined)
 
     /* To handle incoming and outgoing message */
     function socketConnection(){
@@ -58,6 +63,17 @@ export function SocketHook({ children }){
                 }
 
                 setMessage(prev => [msgFormat, ...prev])
+            })
+
+            // Receive call from peer
+            socket.current.on('receiving-call', (payload) => {
+                setOffer(payload.peer)
+                dispatch(callVoip('Answers'))
+            })
+
+            // Accept call
+            socket.current.on('call-accepted', (payload) => {
+                setAnswer(payload.peer)
             })
 
             // Triggers when new user join
@@ -113,6 +129,10 @@ export function SocketHook({ children }){
                 break
             case 'send-msg':
                 socket.current.emit('send-msg', payload)
+            case 'make-call':
+                socket.current.emit('make-call', payload)
+            case 'accept-call':
+                socket.current.emit('accept-call', payload)
             default:
                 console.log('Default triggered');
         }
@@ -170,7 +190,9 @@ export function SocketHook({ children }){
         <AgentContext.Provider value={{
             messages, setMessage,
             socketConnection, emitMessage,
-            onlineActiveUsers, activeUsers
+            onlineActiveUsers, activeUsers,
+            offer, setOffer,
+            answer, setAnswer
         }}>
             { children }
         </AgentContext.Provider>

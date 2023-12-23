@@ -2,7 +2,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Icon, Text } from '@rneui/themed';
-import { callAuthorize } from '../redux/slize';
 import { useSelector } from 'react-redux';
 
 import Login from '../authentication/Login';

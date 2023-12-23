@@ -7,7 +7,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import { z } from "zod";
 import { endpoints } from '../../endpoints';
-import { callAuthorize } from '../redux/slize';
+import { callAuthorize, callUserdata } from '../redux/slize';
 import { useDispatch } from 'react-redux';
 import Realm from "realm";
 
@@ -48,6 +48,9 @@ export default function Login({ navigation }){
             await tokeSchema.write(() => {
                 tokeSchema.create('Token', props);
             });
+
+            const token = tokeSchema.objects('Token');
+            dispatch(callUserdata(JSON.stringify(token[0])))
             dispatch(callAuthorize(true))
         } 
         catch(err) {
@@ -72,12 +75,12 @@ export default function Login({ navigation }){
             })
 
             const token = tokeSchema.objects('Token');
-            console.log('Line no 74: ', token);
 
             axios.post(`${endpoint}/app/verfiy`, token[0], {withCredentials: true})
             .then((res) => {
                 let status = res.data.status
                 if(status == 'success'){
+                    dispatch(callUserdata(JSON.stringify(token[0])))
                     dispatch(callAuthorize(true))
                 }
             })

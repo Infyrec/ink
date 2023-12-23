@@ -15,13 +15,18 @@ let servers = {
     iceServers:[
         {
             urls:['stun:stun1.1.google.com:19302', 'stun:stun2.1.google.com:19302']
+        },
+        {
+            url: 'turn:numb.viagenie.ca',
+            credential: 'muazkh',
+            username: 'webrtc@live.com'
         }
     ]
 }
 
 let ice = null
 
-export default function Calls({ navigation }){
+export default function Answers({ navigation }){
 
     let peer = useRef(new RTCPeerConnection(servers))
     let dispatch = useDispatch()
@@ -34,27 +39,30 @@ export default function Calls({ navigation }){
     let [localStream, setLocalStream] = useState(null)
 
     useEffect(() => {
-        if(offer == undefined){
-            /* To initiate the call */
+        if(offer != undefined){
+            /* To answer the call */
             mediaDevices.getUserMedia({video: true, audio: false})
             .then((stream) => {
+                peer.current.setRemoteDescription(JSON.parse(offer))
+                
                 stream.getTracks().forEach((track) => {
                     peer.current.addTrack(track, stream)
                 })
-    
-                let channel = peer.current.createDataChannel('ink')
         
-                channel.onopen = (e) => {
-                    console.log('Channel Created !');
+                peer.current.ondatachannel = (e) => {
+                    let channel = e.channel
+        
+                    channel.onopen = (e) => {
+                        console.log('Connection Opened !');
+                        channel.onmessage = (e) => {
+                            console.log(e.data);
+                        }
+                    }
                 }
         
-                channel.onmessage = (e) => {
-                    console.log('Msg Received : ' + e.data);
-                }
-        
-                peer.current.createOffer()
-                .then((offer) => {
-                    peer.current.setLocalDescription(offer)
+                peer.current.createAnswer()
+                .then((answer) => {
+                    peer.current.setLocalDescription(answer)
                 })
                 .catch((err) => {
                     console.log(err);
@@ -62,20 +70,16 @@ export default function Calls({ navigation }){
         
                 peer.current.onicecandidate = (e) => {
                     let meta = {...stranger, peer: JSON.stringify(peer.current.localDescription)}
-                    emitMessage('make-call', meta)
+                    emitMessage('accept-call', meta)
                 }
 
                 peer.current.ontrack = (e) => {
-                    console.log('Initiators stream');
+                    console.log('Answers stream');
                     setLocalStream(e.streams[0])
                 }
             })
         }
-
-        if(answer != undefined){
-            peer.current.setRemoteDescription(JSON.parse(answer))
-        }
-    }, [answer])
+    }, [offer])
     
     useEffect(() => {
         if(voip == 'Messages'){

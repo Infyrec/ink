@@ -3,20 +3,25 @@ import { SafeAreaView, View, Text, StyleSheet, TextInput, FlatList, TouchableOpa
 import { Avatar, Icon } from '@rneui/themed';
 import Realm from "realm";
 import { useSocket } from './Socket';
+import { callStranger } from '../redux/slize';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Sender, Stranger } from './Templates';
 
 const dimensions = Dimensions.get('screen');
 
 export default function Messages({ route, navigation }){
+  
   let { emitMessage, messages, setMessage } = useSocket()
-  let [userData, setUserData] = useState(null)
+  let userdata = useSelector((state) => state.slize.userdata)
+  let stranger = useSelector((state) => state.slize.stranger)
+  let voip = useSelector((state) => state.slize.voip)
+  let dispatch = useDispatch()
+
   let [written, setWritten] = useState(null)
-  let [stranger, setStranger] = useState(null)
 
   useEffect(() => {
-    setStranger(route.params)
-    getUserData()
+    dispatch(callStranger(route.params))
 
     // navigation.addListener('beforeRemove', (e) => {
     //   e.preventDefault()
@@ -24,44 +29,30 @@ export default function Messages({ route, navigation }){
     // })
   }, [])
 
-  async function getUserData(){
-    try {
-      const tokeSchema = await Realm.open({
-          schema: [
-            {
-              name: 'Token',
-              properties: {
-                username: 'string',
-                email: 'string',  
-                token: 'string',
-              },
-            },
-          ],
-      })
-
-      const token = tokeSchema.objects('Token');
-      setUserData(token[0])
-      } 
-      catch(err) {
-          console.error('Error querying token:', err);
-      }
-  }
+  useEffect(() => {
+    if(voip == 'Calls'){
+      navigation.navigate('Calls')
+    }
+    else if(voip == 'Answers'){
+      navigation.navigate('Answers')
+    }
+  }, [voip])
 
   function sendMessage(){
-    console.log(userData);
+    console.log(userdata);
     if(written != null && written.length > 0){
       /* Sent to peer */
       let payload = {
         message: written,
         sendTo: stranger.email,
-        username: userData.username
+        username: JSON.parse(userdata).username
       }
 
       /* Added to list */
       let msgFormat = {
         type: 'post', 
         time: currentTime(), 
-        name: userData.username, 
+        name: JSON.parse(userdata).username, 
         message: written
       }
 
