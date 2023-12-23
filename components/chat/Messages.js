@@ -12,7 +12,7 @@ const dimensions = Dimensions.get('screen');
 
 export default function Messages({ route, navigation }){
   
-  let { emitMessage, messages, setMessage } = useSocket()
+  let { emitMessage, messages, setMessage, offer } = useSocket()
   let userdata = useSelector((state) => state.slize.userdata)
   let stranger = useSelector((state) => state.slize.stranger)
   let voip = useSelector((state) => state.slize.voip)
@@ -33,10 +33,10 @@ export default function Messages({ route, navigation }){
     if(voip == 'Calls'){
       navigation.navigate('Calls')
     }
-    else if(voip == 'Answers'){
+    else if(offer != undefined){
       navigation.navigate('Answers')
     }
-  }, [voip])
+  }, [voip, offer])
 
   function sendMessage(){
     console.log(userdata);

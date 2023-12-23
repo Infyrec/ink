@@ -17,9 +17,9 @@ let servers = {
             urls:['stun:stun1.1.google.com:19302', 'stun:stun2.1.google.com:19302']
         },
         {
-            url: 'turn:numb.viagenie.ca',
-            credential: 'muazkh',
-            username: 'webrtc@live.com'
+            url: 'turn:relay1.expressturn.com:3478?transport=udp',
+            credential: 'efQ8LDAMIE1NZNCTVG',
+            username: 'gfFppa3Ell0Do25S'
         }
     ]
 }
@@ -35,19 +35,18 @@ export default function Answers({ navigation }){
     let stranger = useSelector((state) => state.slize.stranger)
     //let ice = useSelector((state) => state.slize.ice)
     let { emitMessage, offer, answer } = useSocket()
-    let [ice, setIce] = useState(null)
     let [localStream, setLocalStream] = useState(null)
 
     useEffect(() => {
         if(offer != undefined){
             /* To answer the call */
             mediaDevices.getUserMedia({video: true, audio: false})
-            .then((stream) => {
-                peer.current.setRemoteDescription(JSON.parse(offer))
-                
+            .then((stream) => {       
                 stream.getTracks().forEach((track) => {
                     peer.current.addTrack(track, stream)
                 })
+
+                peer.current.setRemoteDescription(JSON.parse(offer))
         
                 peer.current.ondatachannel = (e) => {
                     let channel = e.channel
@@ -60,24 +59,27 @@ export default function Answers({ navigation }){
                     }
                 }
         
-                peer.current.createAnswer()
-                .then((answer) => {
-                    peer.current.setLocalDescription(answer)
-                })
-                .catch((err) => {
-                    console.log(err);
-                })
-        
-                peer.current.onicecandidate = (e) => {
-                    let meta = {...stranger, peer: JSON.stringify(peer.current.localDescription)}
+                return peer.current.createAnswer()
+            })
+            .then((answer) => peer.current.setLocalDescription(answer))
+            .catch((err) => {
+                console.log(err);
+            })
+    
+            peer.current.onicecandidate = (e) => {
+                if(e.candidate){
+                    ice = peer.current.localDescription
+                }
+                else if(e.candidate == null){
+                    let meta = {...stranger, peer: JSON.stringify(ice)}
                     emitMessage('accept-call', meta)
                 }
+            }
 
-                peer.current.ontrack = (e) => {
-                    console.log('Answers stream');
-                    setLocalStream(e.streams[0])
-                }
-            })
+            peer.current.ontrack = (e) => {
+                console.log('Answers stream');
+                setLocalStream(e.streams[0])
+            }
         }
     }, [offer])
     

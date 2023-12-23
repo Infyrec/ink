@@ -15,6 +15,11 @@ let servers = {
     iceServers:[
         {
             urls:['stun:stun1.1.google.com:19302', 'stun:stun2.1.google.com:19302']
+        },
+        {
+            url: 'turn:relay1.expressturn.com:3478?transport=udp',
+            credential: 'efQ8LDAMIE1NZNCTVG',
+            username: 'gfFppa3Ell0Do25S'
         }
     ]
 }
@@ -30,7 +35,6 @@ export default function Calls({ navigation }){
     let stranger = useSelector((state) => state.slize.stranger)
     //let ice = useSelector((state) => state.slize.ice)
     let { emitMessage, offer, answer } = useSocket()
-    let [ice, setIce] = useState(null)
     let [localStream, setLocalStream] = useState(null)
 
     useEffect(() => {
@@ -52,27 +56,33 @@ export default function Calls({ navigation }){
                     console.log('Msg Received : ' + e.data);
                 }
         
-                peer.current.createOffer()
-                .then((offer) => {
-                    peer.current.setLocalDescription(offer)
-                })
-                .catch((err) => {
-                    console.log(err);
-                })
-        
-                peer.current.onicecandidate = (e) => {
-                    let meta = {...stranger, peer: JSON.stringify(peer.current.localDescription)}
+                return peer.current.createOffer()
+            })
+            .then((offer) => peer.current.setLocalDescription(offer))
+            .catch((err) => {
+                console.log(err);
+            })
+
+            peer.current.onicecandidate = (e) => {
+                if(e.candidate){
+                    ice = peer.current.localDescription
+                }
+                else if(e.candidate == null){
+                    let meta = {...stranger, peer: JSON.stringify(ice)}
                     emitMessage('make-call', meta)
                 }
+            }
 
-                peer.current.ontrack = (e) => {
-                    console.log('Initiators stream');
-                    setLocalStream(e.streams[0])
-                }
-            })
+            peer.current.ontrack = (e) => {
+                console.log('Initiators stream');
+                setLocalStream(e.streams[0])
+            }
         }
+    }, [])
 
+    useEffect(() => {
         if(answer != undefined){
+            console.log('Answer received');
             peer.current.setRemoteDescription(JSON.parse(answer))
         }
     }, [answer])

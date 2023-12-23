@@ -165,8 +165,8 @@ export default function Home(){
                     {()=>(<Text style={{ color: 'white', fontSize: 30 }}>{Math.round(percentage)}%</Text>)}
                 </AnimatedCircularProgress>
                 <View style={{ flexDirection: 'column' }}>
-                    <Text style={{ color: 'white', fontFamily: 'poppins-semibold', fontSize: 16, marginVertical: 4 }}>Available Size: {diskspace.free} GB</Text>
-                    <Text style={{ color: 'white', fontFamily: 'poppins-semibold', fontSize: 16, marginVertical: 4 }}>Total Size: {diskspace.size} GB</Text>
+                    <Text style={{ color: 'white', fontFamily: 'poppins-semibold', fontSize: 16, marginVertical: 4 }}>Available: {diskspace.free} GB</Text>
+                    <Text style={{ color: 'white', fontFamily: 'poppins-semibold', fontSize: 16, marginVertical: 4 }}>Total: {diskspace.size} GB</Text>
                 </View>
             </View>
             <View style={_home.listView}>

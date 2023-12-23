@@ -68,7 +68,7 @@ export function SocketHook({ children }){
             // Receive call from peer
             socket.current.on('receiving-call', (payload) => {
                 setOffer(payload.peer)
-                dispatch(callVoip('Answers'))
+                //dispatch(callVoip('Answers'))
             })
 
             // Accept call
