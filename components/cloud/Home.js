@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Alert, Dimensions } from 'react-native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { Icon, Avatar, ListItem } from '@rneui/themed';
 import React, { useState, useEffect } from 'react';
 import { callAuthorize } from '../redux/slize';
 import { useSelector, useDispatch } from 'react-redux'
-import { endpoints } from '../../endpoints'
+import { endpoints } from '../../endpoints';
+import { wsize, hsize, fsize } from '../library/Scale';
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system'
 import Realm from "realm";
@@ -156,17 +157,17 @@ export default function Home(){
             <Text style={[_home.titleOne, {paddingHorizontal: 20}]}>Storage</Text>
             <View style={_home.chart}>
                 <AnimatedCircularProgress
-                    size={150}
-                    width={10}
+                    size={wsize(150)}
+                    width={wsize(10)}
                     fill={parseInt(percentage)}
                     tintColor="#39c264"
                     backgroundColor="#3d5875"
                 >
-                    {()=>(<Text style={{ color: 'white', fontSize: 30 }}>{Math.round(percentage)}%</Text>)}
+                    {()=>(<Text style={{ color: 'white', fontSize: 30, fontFamily: 'poppins' }}>{Math.round(percentage)}%</Text>)}
                 </AnimatedCircularProgress>
                 <View style={{ flexDirection: 'column' }}>
-                    <Text style={{ color: 'white', fontFamily: 'poppins-semibold', fontSize: 16, marginVertical: 4 }}>Available: {diskspace.free} GB</Text>
-                    <Text style={{ color: 'white', fontFamily: 'poppins-semibold', fontSize: 16, marginVertical: 4 }}>Total: {diskspace.size} GB</Text>
+                    <Text style={{ color: 'white', fontFamily: 'poppins-semibold', fontSize: fsize(12), marginVertical: 4 }}>Available: {diskspace.free} GB</Text>
+                    <Text style={{ color: 'white', fontFamily: 'poppins-semibold', fontSize: fsize(12), marginVertical: 4 }}>Total: {diskspace.size} GB</Text>
                 </View>
             </View>
             <View style={_home.listView}>
@@ -179,13 +180,13 @@ export default function Home(){
                                 <ListItem bottomDivider containerStyle={{ backgroundColor: '#26282d' }}>
                                     <Avatar
                                         source={require('../../assets/docs.png')}
-                                        size={50}
+                                        size={wsize(38)}
                                     />
                                     <ListItem.Content>
-                                        <ListItem.Title style={{ color: 'white', fontFamily: 'poppins' }}>
+                                        <ListItem.Title style={{ color: 'white', fontFamily: 'poppins', fontSize: fsize(12) }}>
                                             {item.file}
                                         </ListItem.Title>
-                                        <ListItem.Subtitle style={{ color: 'white', fontFamily: 'poppins', fontSize: 12 }}>
+                                        <ListItem.Subtitle style={{ color: 'white', fontFamily: 'poppins', fontSize: fsize(9) }}>
                                             {`Type: ${item.type} | Size: ${item.size}`}
                                         </ListItem.Subtitle>
                                     </ListItem.Content>
@@ -203,13 +204,13 @@ export default function Home(){
                 </View>
                 <View style={[downloadProgress == 0 ? {display: 'none'} : {display: 'flex'}, _home.download]}>
                     <AnimatedCircularProgress
-                        size={60}
+                        size={fsize(60)}
                         width={6}
                         fill={Math.round(downloadProgress)}
                         tintColor="#39c264"
                         backgroundColor="#3d5875"
                     >
-                        {()=>(<Text style={{ color: 'white', fontSize: 10 }}>{Math.round(downloadProgress)}%</Text>)}
+                        {()=>(<Text style={{ color: 'white', fontSize: 10, fontFamily: 'poppins' }}>{Math.round(downloadProgress)}%</Text>)}
                     </AnimatedCircularProgress>
                 </View>
             </View>
@@ -262,7 +263,7 @@ const _home = StyleSheet.create({
         fontFamily: 'poppins',
         color: 'white', 
         marginTop: 20,
-        fontSize: 20
+        fontSize: fsize(16)
     },
     submenu: {
         flex: 1,

@@ -34,7 +34,7 @@ export default function Messages({ route, navigation }){
       navigation.navigate('Calls')
     }
     else if(offer != undefined){
-      navigation.navigate('Answers')
+      navigation.navigate('Calls')
     }
   }, [voip, offer])
 

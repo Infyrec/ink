@@ -7,6 +7,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { z } from 'zod';
 import axios from 'axios';
 import { endpoints } from '../../endpoints';
+import { fsize, hsize, wsize } from '../library/Scale';
 
 let endpoint = endpoints.authentication
 
@@ -92,33 +93,33 @@ export default function Signup({ navigation }){
                     <View style={{ marginVertical: 8 }}>
                         <Input
                             placeholder="Username"
-                            leftIcon={<Icon name="account-box" size={24} />}
+                            leftIcon={<Icon name="account-box" size={fsize(20)} />}
                             onChangeText={(text) => setCred(prev => ({...prev, username: text}))}
                             value={cred.username}
-                            style={{ fontFamily: 'poppins', color: indicate ? '#00d1b2' : '#ff3860'}}
+                            style={{ fontFamily: 'poppins', fontSize: fsize(15), color: indicate ? '#00d1b2' : '#ff3860'}}
                         />
                         <Input
                             placeholder="Email"
-                            leftIcon={<Icon name="email" size={24} />}
+                            leftIcon={<Icon name="email" size={fsize(20)} />}
                             onChangeText={(text) => setCred(prev => ({...prev, email: text}))}
                             value={cred.email}
-                            style={{ fontFamily: 'poppins' }}
+                            style={{ fontFamily: 'poppins', fontSize: fsize(15) }}
                         />
                         <Input
                             placeholder="Password"
                             secureTextEntry
-                            leftIcon={<Icon name="lock" size={24} />}
+                            leftIcon={<Icon name="lock" size={fsize(20)} />}
                             onChangeText={(text) => setCred(prev => ({...prev, password: text}))}
                             value={cred.password}
-                            style={{ fontFamily: 'poppins' }}
+                            style={{ fontFamily: 'poppins', fontSize: fsize(15) }}
                         />
                     </View>
                     <View style={{ alignItems: 'center' }}>
                         <TouchableOpacity style={_signup.btn} onPress={processSignup}>
-                            <Text style={{ color: 'white', fontSize: 18, fontFamily: 'poppins-semibold' }}>Signup</Text>
+                            <Text style={{ color: 'white', fontSize: fsize(14), fontFamily: 'poppins-semibold' }}>Signup</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={{ marginTop: 30 }} onPress={() => navigation.navigate('Login')}>
-                            <Text style={{ textDecorationLine: 'underline', fontFamily: 'poppins' }}>Already having an account? Login</Text>
+                            <Text style={{ textDecorationLine: 'underline', fontFamily: 'poppins', fontSize: fsize(10) }}>Already having an account? Login</Text>
                         </TouchableOpacity>
                     </View>
                 </Card>
@@ -152,7 +153,7 @@ const _signup = StyleSheet.create({
         minWidth: 320
     },
     cardTitle: {
-        fontSize: 28, 
+        fontSize: fsize(22), 
         fontWeight: 'normal',
         fontFamily: 'poppins-semibold',
     },

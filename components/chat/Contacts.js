@@ -5,6 +5,7 @@ import { useSocket } from './Socket';
 import Realm from "realm";
 import axios from 'axios';
 import { endpoints } from '../../endpoints';
+import { fsize, hsize, wsize } from '../library/Scale';
 
 let connection = endpoints.connection
 
@@ -26,7 +27,7 @@ export default function Contacts({ navigation }){
                             <Avatar
                                 rounded
                                 source={{ uri: "https://randomuser.me/api/portraits/men/36.jpg" }}
-                                size={54}
+                                size={wsize(55)}
                             />
                             <ListItem.Content>
                                 <ListItem.Title style={{ fontFamily: 'poppins' }}>{item.username}</ListItem.Title>

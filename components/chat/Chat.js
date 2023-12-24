@@ -4,6 +4,7 @@ import { Avatar, Text, Icon } from '@rneui/themed';
 import { SocketHook } from './Socket';
 import { callVoip } from '../redux/slize';
 import { useSelector, useDispatch } from 'react-redux';
+import { fsize, hsize, wsize } from '../library/Scale';
 
 import Contacts from './Contacts';
 import Messages from './Messages';
@@ -22,12 +23,12 @@ export default function Chat({ navigation }){
         return(            
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Avatar
-                    size={40}
+                    size={wsize(40)}
                     rounded
                     source={{ uri: "https://randomuser.me/api/portraits/men/36.jpg" }}
                 />
                 <View style={{ marginLeft: 10 }}>
-                    <Text style={{ fontSize: 18, fontFamily: 'poppins' }}>
+                    <Text style={{ fontSize: fsize(15), fontFamily: 'poppins' }}>
                         {
                             stranger != null ? stranger.username : 'Unknown'
                         }

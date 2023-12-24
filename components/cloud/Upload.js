@@ -7,6 +7,7 @@ import { callNewfile } from '../redux/slize';
 import * as DocumentPicker from 'expo-document-picker';
 import axios from 'axios';
 import { endpoints } from '../../endpoints';
+import { fsize, hsize, wsize } from '../library/Scale';
 
 let storage = endpoints.storage
 
@@ -77,24 +78,24 @@ export default function Upload(){
     return(
         <View style={_upload.container}>
             <View style={_upload.hint}>
-                <Text style={{ fontFamily: 'poppins', color: 'white', fontSize: 20 }}>{
+                <Text style={{ fontFamily: 'poppins', color: 'white', fontSize: fsize(20) }}>{
                     uploadPercentage == 0 ? 'Choose file to upload' : uploadPercentage < 100 ? 'Upload in progress' : 'Processing'
                 }</Text>
             </View>
             <AnimatedCircularProgress
-                size={200}
-                width={10}
+                size={wsize(180)}
+                width={wsize(10)}
                 fill={uploadPercentage}
                 tintColor="#39c264"
                 backgroundColor="#3d5875"
             >
-                {()=>(<Text style={{ color: 'white', fontSize: 40 }}>{uploadPercentage}%</Text>)}
+                {()=>(<Text style={{ color: 'white', fontSize: fsize(30) }}>{uploadPercentage}%</Text>)}
             </AnimatedCircularProgress>
             <TouchableOpacity style={_upload.btn} onPress={handleUpload}>
-                <Text style={{ color: 'white', fontFamily: 'poppins', fontSize: 18 }}>
+                <Text style={{ color: 'white', fontFamily: 'poppins', fontSize: fsize(14) }}>
                     Choose File
                 </Text>
-                <Icon name='document' type='ionicon' color='white' style={{ marginLeft: 10 }}/>
+                <Icon name='document' type='ionicon' color='white' size={fsize(18)} style={{ marginLeft: 10 }}/>
             </TouchableOpacity>
         </View>
     )
@@ -108,13 +109,13 @@ let _upload = StyleSheet.create({
         backgroundColor: '#26282d'
     },
     hint: {
-        marginVertical: 50
+        marginVertical: hsize(50)
     },
     btn: {
         flexDirection: 'row',
-        marginTop: 80,
-        paddingVertical: 10,
-        paddingHorizontal: 20,
+        marginTop: hsize(80),
+        paddingVertical: hsize(10),
+        paddingHorizontal: wsize(20),
         backgroundColor: '#3b78ff',
         elevation: 4
     }

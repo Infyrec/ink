@@ -10,6 +10,7 @@ import { endpoints } from '../../endpoints';
 import { callAuthorize, callUserdata } from '../redux/slize';
 import { useDispatch } from 'react-redux';
 import Realm from "realm";
+import { fsize, hsize, wsize } from '../library/Scale';
 
 const credSchema = z.object({
     email: z.string().email(),
@@ -136,26 +137,26 @@ export default function Login({ navigation }){
                     <View style={{ marginVertical: 8 }}>
                         <Input
                             placeholder="Email"
-                            leftIcon={<Icon name="email" size={24} />}
+                            leftIcon={<Icon name="email" size={fsize(20)} />}
                             onChangeText={(text) => setCred(prev => ({...prev, email: text}))}
                             value={cred.email}
-                            style={{ fontFamily: 'poppins' }}
+                            style={{ fontFamily: 'poppins', fontSize: fsize(15) }}
                         />
                         <Input
                             placeholder="Password"
                             secureTextEntry
-                            leftIcon={<Icon name="lock" size={24} />}
+                            leftIcon={<Icon name="lock" size={fsize(20)} />}
                             onChangeText={(text) => setCred(prev => ({...prev, password: text}))}
                             value={cred.password}
-                            style={{ fontFamily: 'poppins' }}
+                            style={{ fontFamily: 'poppins', fontSize: fsize(15) }}
                         />
                     </View>
                     <View style={{ alignItems: 'center' }}>
                         <TouchableOpacity style={_login.btn} onPress={processLogin }>
-                            <Text style={{ color: 'white', fontSize: 18, fontFamily: 'poppins-semibold' }}>Login</Text>
+                            <Text style={{ color: 'white', fontSize: fsize(14), fontFamily: 'poppins-semibold' }}>Login</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={{ marginTop: 30 }} onPress={() => navigation.navigate('Signup')}>
-                            <Text style={{ textDecorationLine: 'underline', fontFamily: 'poppins' }}>New to Ink? Create Account</Text>
+                            <Text style={{ textDecorationLine: 'underline', fontFamily: 'poppins', fontSize: fsize(10) }}>New to Ink? Create Account</Text>
                         </TouchableOpacity>
                     </View>
                 </Card>
@@ -188,10 +189,10 @@ const _login = StyleSheet.create({
         backgroundColor: 'white', 
         borderColor: 'white',
         padding: 18,
-        minWidth: 320
+        minWidth: wsize(320)
     },
     cardTitle: {
-        fontSize: 28, 
+        fontSize: fsize(22), 
         fontWeight: 'normal',
         fontFamily: 'poppins-semibold',
     },

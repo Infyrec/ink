@@ -10,6 +10,7 @@ import {
 	mediaDevices,
 
 } from 'react-native-webrtc';
+import { wsize } from '../library/Scale';
 
 let servers = {
     iceServers:[
@@ -86,6 +87,52 @@ export default function Calls({ navigation }){
             peer.current.setRemoteDescription(JSON.parse(answer))
         }
     }, [answer])
+
+    useEffect(() => {
+        if(offer != undefined){
+            /* To answer the call */
+            mediaDevices.getUserMedia({video: true, audio: false})
+            .then((stream) => {       
+                stream.getTracks().forEach((track) => {
+                    peer.current.addTrack(track, stream)
+                })
+
+                peer.current.setRemoteDescription(JSON.parse(offer))
+        
+                peer.current.ondatachannel = (e) => {
+                    let channel = e.channel
+        
+                    channel.onopen = (e) => {
+                        console.log('Connection Opened !');
+                        channel.onmessage = (e) => {
+                            console.log(e.data);
+                        }
+                    }
+                }
+        
+                return peer.current.createAnswer()
+            })
+            .then((answer) => peer.current.setLocalDescription(answer))
+            .catch((err) => {
+                console.log(err);
+            })
+    
+            peer.current.onicecandidate = (e) => {
+                if(e.candidate){
+                    ice = peer.current.localDescription
+                }
+                else if(e.candidate == null){
+                    let meta = {...stranger, peer: JSON.stringify(ice)}
+                    emitMessage('accept-call', meta)
+                }
+            }
+
+            peer.current.ontrack = (e) => {
+                console.log('Answers stream');
+                setLocalStream(e.streams[0])
+            }
+        }
+    }, [offer])
     
     useEffect(() => {
         if(voip == 'Messages'){
@@ -137,13 +184,14 @@ const _calls = StyleSheet.create({
         width: '100%',
         height: 'auto',
         flexDirection: 'row',
-        justifyContent: 'space-around'
+        justifyContent: 'center'
     }, 
     design: { 
         backgroundColor: '#26282D', 
         padding: 16, 
         borderRadius: 50, 
         justifyContent: 'center', 
-        alignItems: 'center' 
+        alignItems: 'center',
+        marginHorizontal: wsize(16) 
     }
 })

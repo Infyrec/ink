@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Avatar, Text, Icon } from '@rneui/themed';
+import { fsize, hsize, wsize } from '../library/Scale';
 
 /* Sender Message UI */
 export function Sender({ name, time, message }){
@@ -8,15 +9,15 @@ export function Sender({ name, time, message }){
       <View style={_sender.layout}>
         <View style={_sender.lineOne}>
           <Avatar
-            size={32}
+            size={wsize(32)}
             rounded
             source={{ uri: "https://randomuser.me/api/portraits/men/36.jpg" }}
           />
-          <Text style={{ marginHorizontal: 6, fontFamily: 'poppins' }}>{name}</Text>
-          <Text style={{ marginHorizontal: 6, fontFamily: 'poppins', color: '#b3b3b3' }}>{time}</Text>
+          <Text style={{ marginHorizontal: 6, fontFamily: 'poppins', fontSize: fsize(10) }}>{name}</Text>
+          <Text style={{ marginHorizontal: 6, fontFamily: 'poppins', color: '#b3b3b3', fontSize: fsize(10) }}>{time}</Text>
         </View>
         <View style={_sender.lineTwo}>
-          <Text style={{ color: 'white', fontFamily: 'poppins' }}>{message}</Text>
+          <Text style={{ color: 'white', fontFamily: 'poppins', fontSize: fsize(12) }}>{message}</Text>
         </View>
       </View>
   )
