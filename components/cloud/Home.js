@@ -60,6 +60,7 @@ export default function Home(){
         })
     }
 
+    /* To download file from server */
     const startDownload = async () => {
         const fileURI = FileSystem.documentDirectory+selected.file;
         const fileURL = storage+'/download?file='+selected.uid+'.'+selected.file.split('.')[1]
@@ -103,6 +104,7 @@ export default function Home(){
         }
     }
 
+    /* To delete file from server */
     const deleteFile = () => {
         if(selected != null){
             axios.post(`${storage}/delete`, selected)
@@ -116,6 +118,7 @@ export default function Home(){
         }
     }
 
+    /* To logout */
     const logOut = async() => {
         try{
             const tokeSchema = await Realm.open({
@@ -179,7 +182,19 @@ export default function Home(){
                             <TouchableOpacity>
                                 <ListItem bottomDivider containerStyle={{ backgroundColor: '#26282d' }}>
                                     <Avatar
-                                        source={require('../../assets/docs.png')}
+                                        source={
+                                            item.type.split('/')[0] == 'video' ? 
+                                            require('../../assets/icons/video.png'):
+                                            item.type.split('/')[0] == 'image' ?
+                                            require('../../assets/icons/image.png'):
+                                            item.type.split('/')[0] == 'audio' ?
+                                            require('../../assets/icons/audio.png'):
+                                            item.type.split('/')[0] == 'font' ?
+                                            require('../../assets/icons/font.png'):
+                                            item.type.split('/')[0] == 'application' ?
+                                            require('../../assets/icons/application.png'):
+                                            require('../../assets/icons/docs.png')
+                                        }
                                         size={wsize(38)}
                                     />
                                     <ListItem.Content>
@@ -204,13 +219,13 @@ export default function Home(){
                 </View>
                 <View style={[downloadProgress == 0 ? {display: 'none'} : {display: 'flex'}, _home.download]}>
                     <AnimatedCircularProgress
-                        size={fsize(60)}
+                        size={fsize(50)}
                         width={6}
                         fill={Math.round(downloadProgress)}
                         tintColor="#39c264"
                         backgroundColor="#3d5875"
                     >
-                        {()=>(<Text style={{ color: 'white', fontSize: 10, fontFamily: 'poppins' }}>{Math.round(downloadProgress)}%</Text>)}
+                        {()=>(<Text style={{ color: 'white', fontSize: fsize(10), fontFamily: 'poppins' }}>{Math.round(downloadProgress)}%</Text>)}
                     </AnimatedCircularProgress>
                 </View>
             </View>
