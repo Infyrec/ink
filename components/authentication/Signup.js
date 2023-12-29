@@ -8,6 +8,7 @@ import { z } from 'zod';
 import axios from 'axios';
 import { endpoints } from '../../endpoints';
 import { fsize, hsize, wsize } from '../library/Scale';
+import LottieView from 'lottie-react-native';
 
 let endpoint = endpoints.authentication
 
@@ -128,7 +129,9 @@ export default function Signup({ navigation }){
     }
     else{
         <View style={_signup.loader}>
-            <Image source={require('../../assets/lottie/loader.gif')}
+            <LottieView
+                autoPlay={true}
+                source={require('../../assets/lottie/loader.json')}
                 style={{
                     width: 300,
                     height: 300

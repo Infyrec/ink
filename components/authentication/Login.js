@@ -11,6 +11,7 @@ import { callAuthorize, callUserdata } from '../redux/slize';
 import { useDispatch } from 'react-redux';
 import Realm from "realm";
 import { fsize, hsize, wsize } from '../library/Scale';
+import LottieView from 'lottie-react-native';
 
 const credSchema = z.object({
     email: z.string().email(),
@@ -166,7 +167,9 @@ export default function Login({ navigation }){
     else {
         return(
             <View style={_login.loader}>
-                <Image source={require('../../assets/lottie/loader.gif')}
+                <LottieView
+                    autoPlay={true}
+                    source={require('../../assets/lottie/loader.json')}
                     style={{
                         width: 300,
                         height: 300
