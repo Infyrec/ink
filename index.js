@@ -40,8 +40,7 @@ app.get('/', (req, res) => {
     res.send('Upload server is working fine...!')
 })
 
-
-// To fetch the disk space
+/*---------------------- To read files and disk space ----------------------*/
 app.get('/diskspace', (req, res) => {
   try{
     checkDiskSpace(__dirname+'/uploads').then((diskSpace) =>{
@@ -56,7 +55,6 @@ app.get('/diskspace', (req, res) => {
   }
 })
 
-// To read folder/files
 app.get('/readfiles', async(req, res) => {
   try{
     let files = await FileModel.find({})
@@ -68,12 +66,11 @@ app.get('/readfiles', async(req, res) => {
 })
 
 
-// Handle file upload route
+/*---------------------- To handle file upload from web ----------------------*/
 app.post('/upload', upload.single('file'), (req, res) => {
   res.status(200).json({status: 'success', message: 'File uploaded successfully'});
 });
 
-// To register uploaded file in database
 app.post('/registerUpload', async(req, res) => {
   let { uid, file, size, type, date, location, meta } = req.body
   try{
@@ -102,7 +99,37 @@ app.post('/registerUpload', async(req, res) => {
   }
 })
 
-// To handle download request
+
+/*---------------------- To handle file upload from app ----------------------*/
+app.patch('/app/upload', upload.single('file'), (req, res) => {
+  res.status(200).json({status: 'success', payload: req.file, message: 'File uploaded successfully'});
+  // res.end('OK');
+});
+
+app.post('/app/registerUpload', async(req, res) => {
+  let { uid, file, extension, type, size, date, location } = req.body
+
+  try{
+    let data = new FileModel({
+      uid: uid,
+      file: file,
+      extension: extension,
+      type: type,
+      size: size,
+      date: date,
+      location: location
+    })
+    const dataToSave = await data.save();
+
+    res.status(200).send({status: 'success', message: 'File metadata registered successfully'})
+  }
+  catch(e){
+      res.status(400).send({status: 'failed', message: 'Failed to register metadata'})
+  }
+})
+
+
+/*---------------------- To handle file download ----------------------*/
 app.get('/download', (req, res) => {
     try{
         //res.download(__dirname+'/uploads/'+req.query.file)
@@ -113,10 +140,23 @@ app.get('/download', (req, res) => {
     }
 })
 
-// To handle file delete operation
+/*---------------------- To handle file delete ----------------------*/
 app.post('/delete', async(req, res) => {
   try{
     let file = req.body.uid + '.' + req.body.file.split('.')[1]
+
+    await fs.unlink(__dirname+'/uploads/'+file);
+    let result = await FileModel.findOneAndDelete({ uid: req.body.uid })
+    res.status(200).send({status: 'success', message: 'File deleted successfully'})
+  }
+  catch(e){
+    res.status(400).send('File not found to delete.')
+  }
+})
+
+app.post('/app/delete', async(req, res) => {
+  try{
+    let file = req.body.uid
 
     await fs.unlink(__dirname+'/uploads/'+file);
     let result = await FileModel.findOneAndDelete({ uid: req.body.uid })

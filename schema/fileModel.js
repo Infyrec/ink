@@ -10,11 +10,15 @@ const credSchema = new mongoose.Schema({
         required: true,
         type: String,
     },
-    size: {
+    extension: {
         required: true,
         type: String
     },
     type: {
+        required: true,
+        type: String
+    },
+    size: {
         required: true,
         type: String
     },
@@ -25,10 +29,6 @@ const credSchema = new mongoose.Schema({
     location: {
         required: true,
         type: String
-    },
-    meta: {
-        required: true,
-        type: Object
     }
 })
 
