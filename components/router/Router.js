@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import Login from '../authentication/Login';
 import Signup from '../authentication/Signup';
 import Home from '../cloud/Home';
-import Upload from '../cloud/Upload';
+import Remote from '../cloud/Remote';
 import Chat from '../chat/Chat';
 
 const Stack = createNativeStackNavigator();
@@ -33,12 +33,12 @@ function MainScreen(){
             }}>
             <Tab.Screen name="Home" component={Home} options={{
                 tabBarIcon: ({ color }) => (
-                    <Icon name="file-tray-stacked" type="ionicon" size={24} color={color} />
+                    <Icon name="cloud" type="ionicon" size={24} color={color} />
                 )
             }}/>
-            <Tab.Screen name="Upload" component={Upload} options={{
+            <Tab.Screen name="Remote" component={Remote} options={{
                 tabBarIcon: ({ color }) => (
-                    <Icon name="cloud-upload" type="ionicon" size={24} color={color} />
+                    <Icon name="desktop" type="ionicon" size={24} color={color} />
                 )
             }}/>
             <Tab.Screen name="Chat" component={Chat} options={{

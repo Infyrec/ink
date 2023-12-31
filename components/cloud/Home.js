@@ -4,11 +4,14 @@ import { Icon, Avatar, ListItem } from '@rneui/themed';
 import React, { useState, useEffect } from 'react';
 import { callAuthorize } from '../redux/slize';
 import { useSelector, useDispatch } from 'react-redux'
+import { callNewfile } from '../redux/slize';
 import { endpoints } from '../../endpoints';
 import { wsize, hsize, fsize } from '../library/Scale';
 import axios from 'axios';
+import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system'
 import Realm from "realm";
+import BackgroundService from 'react-native-background-actions';
 
 let storage = endpoints.storage
 
@@ -23,7 +26,7 @@ export default function Home(){
     })
     let [fileList, setFileList] = useState([])
     let [selected, setSelected] = useState(null)
-    let [downloadProgress, setDownloadProgress] = useState(0)
+    let [downloadProgress, setDownloadProgress] = useState(10)
     let [percentage, setPercentage] = useState(0)
     let [menu, openMenu] = useState(false)
 
@@ -89,7 +92,7 @@ export default function Home(){
                     ]);
                 })
                 .catch((err) => {
-                    console.log('Line no 36 : ' + err);
+                    console.log('Line no 95 : ' + err);
                 })
             }
         }
@@ -104,10 +107,80 @@ export default function Home(){
         }
     }
 
+    const veryIntensiveTask = async (taskDataArguments) => {
+        const { delay } = taskDataArguments;
+        await new Promise( async (resolve) => {
+            if(BackgroundService.isRunning()){
+
+            }
+        });
+    };
+
+    /* To handle file upload */
+    const handleUpload = async() => {
+        const options = {
+            taskName: 'Uploader',
+            taskTitle: 'Upload Progress',
+            taskDesc: 'File upload in progress',
+            taskIcon: {
+                name: 'ic_launcher',
+                type: 'mipmap',
+            },
+            color: '#ff00ff',
+            parameters: {
+                delay: 10000,
+            },
+        }
+
+        try {
+            const selectedFile = await DocumentPicker.getDocumentAsync({type: "*/*"})
+
+            await BackgroundService.start(veryIntensiveTask, options);
+
+            let metadata = {
+                file: selectedFile.assets[0].name,
+                extension: selectedFile.assets[0].name.split('.')[1],
+                type: selectedFile.assets[0].mimeType,
+                size: parseInt(selectedFile.assets[0].size / 1024**2) + ' MB',
+                date: new Date().getDate().toString() + '/' + parseInt(new Date().getMonth()+1).toString() + '/' + new Date().getFullYear(),
+                location: '/',
+            }
+
+            const response = await FileSystem.uploadAsync(`${storage}/app/upload`, selectedFile.assets[0].uri, {
+              fieldName: 'file',
+              httpMethod: 'PATCH',
+              uploadType: FileSystem.FileSystemUploadType.MULTIPART
+            });
+
+            await BackgroundService.stop()
+
+            if(JSON.parse(response.body).status == 'success'){
+                axios.post(`${storage}/app/registerUpload`, {
+                    uid: JSON.parse(response.body).payload.filename, 
+                    ...metadata
+                })
+                .then(async(res) => {
+                    dispatch(callNewfile())
+                    Alert.alert('Success', 'File uploaded successfully.', [
+                        {
+                          text: 'Ok',
+                          onPress: () => console.log('Pressed Ok'),
+                        },
+                    ]);
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     /* To delete file from server */
     const deleteFile = () => {
         if(selected != null){
-            axios.post(`${storage}/delete`, selected)
+            axios.post(`${storage}/app/delete`, selected)
             .then((res) => {
                 console.log('File deleted successfully.');
                 readFiles()
@@ -175,58 +248,53 @@ export default function Home(){
             </View>
             <View style={_home.listView}>
                 <Text style={_home.titleOne}>All Files</Text>
-                <View>
-                    <FlatList
-                        data={fileList}
-                        renderItem={({item}) => (
-                            <TouchableOpacity>
-                                <ListItem bottomDivider containerStyle={{ backgroundColor: '#26282d' }}>
-                                    <Avatar
-                                        source={
-                                            item.type.split('/')[0] == 'video' ? 
-                                            require('../../assets/icons/video.png'):
-                                            item.type.split('/')[0] == 'image' ?
-                                            require('../../assets/icons/image.png'):
-                                            item.type.split('/')[0] == 'audio' ?
-                                            require('../../assets/icons/audio.png'):
-                                            item.type.split('/')[0] == 'font' ?
-                                            require('../../assets/icons/font.png'):
-                                            item.type.split('/')[0] == 'application' ?
-                                            require('../../assets/icons/application.png'):
-                                            require('../../assets/icons/docs.png')
-                                        }
-                                        size={wsize(38)}
-                                    />
-                                    <ListItem.Content>
-                                        <ListItem.Title style={{ color: 'white', fontFamily: 'poppins', fontSize: fsize(12) }}>
-                                            {item.file}
-                                        </ListItem.Title>
-                                        <ListItem.Subtitle style={{ color: 'white', fontFamily: 'poppins', fontSize: fsize(9) }}>
-                                            {`Type: ${item.type} | Size: ${item.size}`}
-                                        </ListItem.Subtitle>
-                                    </ListItem.Content>
-                                    <TouchableOpacity onPress={() => {
-                                        setSelected(item)
-                                        openMenu(true)
-                                    }}>
-                                        <Icon name="grid" type="ionicon" size={24} color="white" />
-                                    </TouchableOpacity>
-                                </ListItem>
-                            </TouchableOpacity>
-                        )}
-                        keyExtractor={item => item.uid}
+                <FlatList
+                    data={fileList}
+                    renderItem={({item}) => (
+                        <TouchableOpacity>
+                            <ListItem bottomDivider containerStyle={{ backgroundColor: '#26282d' }}>
+                                <Avatar
+                                    source={
+                                        item.type.split('/')[0] == 'video' ? 
+                                        require('../../assets/icons/video.png'):
+                                        item.type.split('/')[0] == 'image' ?
+                                        require('../../assets/icons/image.png'):
+                                        item.type.split('/')[0] == 'audio' ?
+                                        require('../../assets/icons/audio.png'):
+                                        item.type.split('/')[0] == 'font' ?
+                                        require('../../assets/icons/font.png'):
+                                        item.type.split('/')[0] == 'application' ?
+                                        require('../../assets/icons/application.png'):
+                                        require('../../assets/icons/docs.png')
+                                    }
+                                    size={wsize(38)}
+                                />
+                                <ListItem.Content>
+                                    <ListItem.Title style={{ color: 'white', fontFamily: 'poppins', fontSize: fsize(12) }}>
+                                        {item.file}
+                                    </ListItem.Title>
+                                    <ListItem.Subtitle style={{ color: 'white', fontFamily: 'poppins', fontSize: fsize(9) }}>
+                                        {`Type: ${item.type} | Size: ${item.size}`}
+                                    </ListItem.Subtitle>
+                                </ListItem.Content>
+                                <TouchableOpacity onPress={() => {
+                                    setSelected(item)
+                                    openMenu(true)
+                                }}>
+                                    <Icon name="grid" type="ionicon" size={24} color="white" />
+                                </TouchableOpacity>
+                            </ListItem>
+                        </TouchableOpacity>
+                    )}
+                    keyExtractor={item => item.uid}
+                />
+                <View style={_home.uploadBtn}>
+                    <Icon
+                        raised
+                        name='upload'
+                        type='font-awesome'
+                        onPress={handleUpload} 
                     />
-                </View>
-                <View style={[downloadProgress == 0 ? {display: 'none'} : {display: 'flex'}, _home.download]}>
-                    <AnimatedCircularProgress
-                        size={fsize(50)}
-                        width={6}
-                        fill={Math.round(downloadProgress)}
-                        tintColor="#39c264"
-                        backgroundColor="#3d5875"
-                    >
-                        {()=>(<Text style={{ color: 'white', fontSize: fsize(10), fontFamily: 'poppins' }}>{Math.round(downloadProgress)}%</Text>)}
-                    </AnimatedCircularProgress>
                 </View>
             </View>
             <Modal visible={menu} transparent={true} animationType='slide'>
@@ -271,7 +339,7 @@ const _home = StyleSheet.create({
         paddingHorizontal: 20
     },
     listView: {
-        flexGrow: 1,
+        flex: 1,
         paddingHorizontal: 20
     },
     titleOne: { 
@@ -287,7 +355,11 @@ const _home = StyleSheet.create({
     },
     download: {
         position: 'absolute',
-        bottom: 24,
-        right: 10
+        bottom: 20,
+        left: 10
+    },
+    uploadBtn: {
+        alignItems: 'flex-end',
+        marginVertical: 10
     }
 })
